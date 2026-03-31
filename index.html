@@ -1,0 +1,2810 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ALPIS ImpactPath v3.5</title>
+  <style>
+    :root {
+      --bg: #07111f;
+      --bg-soft: #0d1b2d;
+      --panel: rgba(13, 27, 45, 0.86);
+      --panel-2: rgba(255,255,255,0.04);
+      --line: rgba(255,255,255,0.08);
+      --text: #eef4ff;
+      --muted: #a8bad6;
+      --primary: #6ea8fe;
+      --primary-2: #4f8dff;
+      --accent: #7ef0c2;
+      --warning: #ffd166;
+      --danger: #ff7b7b;
+      --success: #8de7a8;
+      --shadow: 0 18px 50px rgba(0,0,0,0.3);
+      --radius: 24px;
+      --radius-sm: 16px;
+      --max: 1320px;
+      --bottom-nav-h: 72px;
+      --ring-bg: rgba(255,255,255,0.08);
+      --ring-track: rgba(255,255,255,0.08);
+      --card-hover: translateY(-3px);
+      --surface: rgba(255,255,255,0.03);
+    }
+
+    body.theme-light {
+      --bg: #f4f8ff;
+      --bg-soft: #e8f0ff;
+      --panel: rgba(255,255,255,0.92);
+      --panel-2: rgba(0,0,0,0.03);
+      --line: rgba(12, 32, 60, 0.09);
+      --text: #11243c;
+      --muted: #5c708c;
+      --primary: #3c7cff;
+      --primary-2: #235df0;
+      --accent: #1fc98a;
+      --warning: #d99c15;
+      --danger: #df5d5d;
+      --success: #2fa366;
+      --shadow: 0 18px 50px rgba(38,72,119,0.12);
+      --ring-bg: rgba(17,36,60,0.08);
+      --ring-track: rgba(17,36,60,0.08);
+      --surface: rgba(17,36,60,0.03);
+      background:
+        radial-gradient(circle at top left, rgba(60,124,255,0.12), transparent 22%),
+        radial-gradient(circle at top right, rgba(31,201,138,0.08), transparent 18%),
+        linear-gradient(180deg, #f7fbff 0%, #edf3ff 100%);
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      color: var(--text);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background:
+        radial-gradient(circle at top left, rgba(110,168,254,0.18), transparent 22%),
+        radial-gradient(circle at top right, rgba(126,240,194,0.12), transparent 18%),
+        linear-gradient(180deg, #07111f 0%, #081425 100%);
+      min-height: 100vh;
+      transition: background 180ms ease, color 180ms ease;
+    }
+
+    a { color: inherit; text-decoration: none; }
+    button, input, textarea, select { font: inherit; }
+    button { cursor: pointer; }
+    img { max-width: 100%; display: block; }
+
+    .shell {
+      width: min(100% - 24px, var(--max));
+      margin: 0 auto;
+      padding: 18px 0 calc(120px + var(--bottom-nav-h));
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 70;
+      backdrop-filter: blur(16px);
+      background: color-mix(in srgb, var(--bg) 78%, transparent);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .topbar-inner {
+      width: min(100% - 24px, var(--max));
+      margin: 0 auto;
+      min-height: 74px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+    }
+
+    .brand-badge {
+      width: 42px;
+      height: 42px;
+      border-radius: 14px;
+      display: grid;
+      place-items: center;
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      color: #05111f;
+      font-weight: 800;
+      box-shadow: var(--shadow);
+      flex: 0 0 auto;
+    }
+
+    .brand-copy h1 {
+      margin: 0;
+      font-size: 1rem;
+      line-height: 1.1;
+    }
+
+    .brand-copy p {
+      margin: 4px 0 0;
+      color: var(--muted);
+      font-size: 0.85rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 44vw;
+    }
+
+    .topbar-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .btn, .chip, .tab-btn, .bottom-nav a, .sort-chip {
+      border: 1px solid var(--line);
+      color: var(--text);
+      background: rgba(255,255,255,0.04);
+      border-radius: 999px;
+      padding: 10px 14px;
+      transition: 180ms ease;
+    }
+
+    .btn:hover, .chip:hover, .tab-btn:hover, .bottom-nav a:hover, .sort-chip:hover {
+      transform: translateY(-1px);
+    }
+
+    .card, .result-card, .mission-card, .entry-card, .pin-card, .roadmap-step, .persona-card, .feature-card, .badge-card, .testimonial-card, .skeleton-card, .admin-card {
+      transition: 180ms ease;
+    }
+
+    .card:hover, .result-card:hover, .mission-card:hover, .pin-card:hover, .badge-card:hover, .feature-card:hover, .persona-card:hover, .testimonial-card:hover {
+      transform: var(--card-hover);
+      border-color: rgba(110,168,254,0.22);
+    }
+
+    .btn.primary {
+      background: linear-gradient(135deg, var(--primary), var(--primary-2));
+      border-color: transparent;
+      color: white;
+      box-shadow: 0 10px 28px rgba(79,141,255,0.26);
+    }
+
+    .btn.success {
+      background: linear-gradient(135deg, #4caf7a, #60cb8f);
+      border-color: transparent;
+      color: white;
+    }
+
+    .btn.ghost.active,
+    .chip.active,
+    .tab-btn.active,
+    .bottom-nav a.active,
+    .sort-chip.active {
+      background: rgba(110,168,254,0.16);
+      border-color: rgba(110,168,254,0.34);
+      color: white;
+    }
+
+    body.theme-light .btn.ghost.active,
+    body.theme-light .chip.active,
+    body.theme-light .tab-btn.active,
+    body.theme-light .bottom-nav a.active,
+    body.theme-light .sort-chip.active {
+      color: var(--text);
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      gap: 18px;
+      margin-top: 20px;
+    }
+
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 22px;
+      position: relative;
+      overflow: hidden;
+      transition: background 180ms ease, border-color 180ms ease;
+    }
+
+    .hero-card {
+      min-height: 300px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 24px;
+    }
+
+    .hero-card::after {
+      content: "";
+      position: absolute;
+      inset: auto -60px -100px auto;
+      width: 260px;
+      height: 260px;
+      background: radial-gradient(circle, rgba(126,240,194,0.22), transparent 66%);
+      z-index: 0;
+    }
+
+    .hero-card > * { position: relative; z-index: 1; }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      width: fit-content;
+      font-size: 0.88rem;
+      color: #c9ffe9;
+      background: rgba(126,240,194,0.12);
+      border: 1px solid rgba(126,240,194,0.18);
+    }
+
+    body.theme-light .eyebrow {
+      color: #0f6b4a;
+      background: rgba(31,201,138,0.1);
+      border-color: rgba(31,201,138,0.18);
+    }
+
+    .hero h2 {
+      margin: 14px 0 12px;
+      font-size: clamp(1.9rem, 3vw, 3.4rem);
+      line-height: 1.05;
+      max-width: 13ch;
+    }
+
+    .hero p { margin: 0; color: var(--muted); max-width: 62ch; }
+    .hero-actions, .action-row, .filters, .badge-row, .mini-row, .tabbar, .toolbar-row, .sort-row { display: flex; gap: 10px; flex-wrap: wrap; }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+    }
+
+    .stat {
+      padding: 18px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0.03));
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      transition: 180ms ease;
+    }
+
+    .stat strong { display: block; font-size: clamp(1.4rem, 3vw, 2rem); margin-bottom: 6px; }
+    .stat span { color: var(--muted); font-size: 0.92rem; }
+
+    .tabbar-wrap {
+      position: sticky;
+      top: 74px;
+      z-index: 45;
+      padding-top: 14px;
+      background: linear-gradient(180deg, color-mix(in srgb, var(--bg) 96%, transparent), color-mix(in srgb, var(--bg) 70%, transparent), transparent);
+    }
+
+    .tabbar {
+      overflow-x: auto;
+      padding-bottom: 6px;
+      scrollbar-width: none;
+      flex-wrap: nowrap;
+    }
+
+    .tabbar::-webkit-scrollbar { display: none; }
+    .tab-btn { white-space: nowrap; flex: 0 0 auto; }
+
+    .content {
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 18px;
+      margin-top: 18px;
+    }
+
+    .stack { display: grid; gap: 18px; }
+
+    .section-title {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .section-title h3 { margin: 0; font-size: 1.2rem; }
+    .section-title p { margin: 6px 0 0; color: var(--muted); }
+
+    .grid-2, .grid-3, .kpi-grid, .features-grid, .personas-grid, .badge-grid, .skeleton-grid, .explore-grid, .admin-grid {
+      display: grid;
+      gap: 14px;
+    }
+
+    .grid-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .grid-3, .features-grid, .personas-grid, .badge-grid, .skeleton-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .kpi-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .explore-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .admin-grid { grid-template-columns: 0.9fr 1.1fr; }
+
+    label span, .label {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 0.92rem;
+      color: var(--muted);
+    }
+
+    input, textarea, select {
+      width: 100%;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,0.09);
+      background: rgba(255,255,255,0.05);
+      color: var(--text);
+      padding: 13px 14px;
+      outline: none;
+      transition: 180ms ease;
+    }
+
+    body.theme-light input,
+    body.theme-light textarea,
+    body.theme-light select {
+      background: rgba(17,36,60,0.03);
+      border-color: rgba(17,36,60,0.08);
+    }
+
+    textarea { min-height: 118px; resize: vertical; }
+
+    input:focus, textarea:focus, select:focus {
+      border-color: rgba(110,168,254,0.58);
+      box-shadow: 0 0 0 4px rgba(110,168,254,0.14);
+    }
+
+    .progress-steps {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .step-pill {
+      padding: 14px;
+      border-radius: 18px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid var(--line);
+      transition: 180ms ease;
+    }
+
+    .step-pill.active {
+      background: rgba(110,168,254,0.14);
+      border-color: rgba(110,168,254,0.36);
+    }
+
+    .helper {
+      padding: 14px;
+      border-radius: 16px;
+      background: rgba(126,240,194,0.08);
+      border: 1px solid rgba(126,240,194,0.15);
+      color: #d8fff2;
+      margin-top: 14px;
+    }
+
+    body.theme-light .helper {
+      color: #13523c;
+      background: rgba(31,201,138,0.08);
+      border-color: rgba(31,201,138,0.16);
+    }
+
+    .card, .result-card, .mission-card, .entry-card, .pin-card, .roadmap-step, .persona-card, .feature-card, .badge-card, .testimonial-card, .skeleton-card, .admin-card {
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 16px;
+      background: rgba(255,255,255,0.035);
+    }
+
+    .result-head, .mission-head, .entry-head, .pin-head { display: flex; justify-content: space-between; gap: 10px; align-items: flex-start; margin-bottom: 10px; }
+    .result-list, .mission-list, .roadmap-list, .journal-list, .pins, .testimonials { display: grid; gap: 12px; }
+
+    .tag, .score, .mode, .level, .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      border-radius: 999px;
+      padding: 7px 10px;
+      font-size: 0.82rem;
+    }
+
+    .tag {
+      background: rgba(255,255,255,0.06);
+      color: var(--muted);
+      border: 1px solid rgba(255,255,255,0.07);
+    }
+
+    .score {
+      font-weight: 700;
+      color: #dff1ff;
+      background: rgba(110,168,254,0.14);
+      border: 1px solid rgba(110,168,254,0.22);
+    }
+
+    body.theme-light .score { color: var(--text); }
+
+    .level {
+      background: rgba(126,240,194,0.12);
+      border: 1px solid rgba(126,240,194,0.18);
+      color: #d8fff2;
+    }
+
+    body.theme-light .level { color: #14533d; }
+
+    .mode {
+      background: rgba(255,209,102,0.12);
+      border: 1px solid rgba(255,209,102,0.2);
+      color: #ffe7a3;
+    }
+
+    body.theme-light .mode { color: #7d5a09; }
+
+    .pill {
+      background: rgba(110,168,254,0.1);
+      border: 1px solid rgba(110,168,254,0.18);
+      color: var(--text);
+    }
+
+    .muted { color: var(--muted); }
+    .small { font-size: 0.9rem; color: var(--muted); }
+
+    .empty {
+      border: 1px dashed rgba(255,255,255,0.12);
+      border-radius: 18px;
+      padding: 18px;
+      color: var(--muted);
+      background: rgba(255,255,255,0.02);
+    }
+
+    .roadmap-step {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 14px;
+      align-items: start;
+    }
+
+    .step-index {
+      width: 38px;
+      height: 38px;
+      border-radius: 12px;
+      display: grid;
+      place-items: center;
+      font-weight: 800;
+      background: linear-gradient(135deg, rgba(110,168,254,0.18), rgba(126,240,194,0.16));
+    }
+
+    .kpi {
+      border-radius: 18px;
+      border: 1px solid var(--line);
+      padding: 16px;
+      background: rgba(255,255,255,0.03);
+    }
+
+    .kpi strong { display: block; font-size: 1.48rem; margin-bottom: 4px; }
+
+    .xp-bar {
+      width: 100%;
+      height: 12px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.07);
+      overflow: hidden;
+      margin-top: 12px;
+    }
+
+    .xp-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent), var(--primary));
+      width: 0%;
+      transition: width 300ms ease;
+    }
+
+    .ring-wrap {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 14px;
+      flex-wrap: wrap;
+    }
+
+    .progress-ring {
+      width: 120px;
+      height: 120px;
+      position: relative;
+      flex: 0 0 auto;
+    }
+
+    .progress-ring svg {
+      width: 100%;
+      height: 100%;
+      transform: rotate(-90deg);
+    }
+
+    .progress-ring .ring-label {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      text-align: center;
+      pointer-events: none;
+    }
+
+    .ring-number {
+      font-size: 1.35rem;
+      font-weight: 800;
+      line-height: 1;
+    }
+
+    .ring-caption {
+      font-size: 0.78rem;
+      color: var(--muted);
+      margin-top: 6px;
+    }
+
+    .badge-card.locked { opacity: 0.58; }
+    .badge-card.unlocked {
+      animation: unlockPop 460ms ease;
+    }
+
+    .badge-emoji { font-size: 1.5rem; }
+
+    .map-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+
+    .landing-hero {
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 18px;
+      align-items: stretch;
+    }
+
+    .bottom-nav {
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 65;
+      padding: 10px 12px calc(10px + env(safe-area-inset-bottom));
+      backdrop-filter: blur(16px);
+      background: color-mix(in srgb, var(--bg) 90%, transparent);
+      border-top: 1px solid var(--line);
+      display: none;
+    }
+
+    .bottom-nav-inner {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 8px;
+      width: min(100%, 680px);
+      margin: 0 auto;
+    }
+
+    .bottom-nav a {
+      text-align: center;
+      padding: 10px 8px;
+      font-size: 0.84rem;
+      border-radius: 16px;
+    }
+
+    .toast {
+      position: fixed;
+      right: 16px;
+      bottom: calc(88px + env(safe-area-inset-bottom));
+      z-index: 90;
+      background: rgba(11,23,39,0.96);
+      border: 1px solid rgba(126,240,194,0.18);
+      color: #eafff5;
+      padding: 12px 14px;
+      border-radius: 14px;
+      box-shadow: var(--shadow);
+      opacity: 0;
+      transform: translateY(10px);
+      pointer-events: none;
+      transition: 180ms ease;
+    }
+
+    .toast.show { opacity: 1; transform: translateY(0); }
+    .toast.xp { animation: xpPulse 700ms ease; }
+
+    .hidden { display: none !important; }
+
+    .autosave {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--muted);
+      font-size: 0.84rem;
+      margin-top: 10px;
+    }
+
+    .autosave-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      background: var(--success);
+      box-shadow: 0 0 0 0 rgba(141,231,168,0.4);
+      animation: pulse 1.6s infinite;
+    }
+
+    .mission-toolbar, .explore-toolbar {
+      display: grid;
+      grid-template-columns: 1.2fr 0.8fr;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .sort-row {
+      align-items: center;
+      justify-content: flex-start;
+    }
+
+    .score-breakdown {
+      display: grid;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .score-line {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: 14px;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      font-size: 0.9rem;
+    }
+
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(4, 10, 18, 0.62);
+      z-index: 100;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 18px;
+    }
+
+    .modal-backdrop.show { display: flex; }
+
+    .modal {
+      width: min(100%, 760px);
+      max-height: 90vh;
+      overflow: auto;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      box-shadow: var(--shadow);
+      padding: 22px;
+    }
+
+    .modal-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: start;
+      margin-bottom: 14px;
+    }
+
+    .close-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: 14px;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,0.05);
+      color: var(--text);
+      font-size: 1rem;
+    }
+
+    .share-banner {
+      margin-top: 12px;
+      padding: 12px 14px;
+      border-radius: 16px;
+      border: 1px solid rgba(110,168,254,0.18);
+      background: rgba(110,168,254,0.08);
+      color: var(--text);
+    }
+
+    .readonly-shell {
+      width: min(100% - 24px, 920px);
+      margin: 32px auto;
+      padding-bottom: 40px;
+    }
+
+    .readonly-card {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      padding: 24px;
+      box-shadow: var(--shadow);
+    }
+
+    .readonly-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: start;
+      margin-bottom: 16px;
+    }
+
+    .admin-list {
+      display: grid;
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .mini-stat {
+      padding: 14px;
+      border-radius: 16px;
+      border: 1px solid var(--line);
+      background: var(--surface);
+    }
+
+    .mini-stat strong {
+      display: block;
+      font-size: 1.2rem;
+      margin-bottom: 4px;
+    }
+
+    @keyframes pulse {
+      0% { box-shadow: 0 0 0 0 rgba(141,231,168,0.35); }
+      70% { box-shadow: 0 0 0 10px rgba(141,231,168,0); }
+      100% { box-shadow: 0 0 0 0 rgba(141,231,168,0); }
+    }
+
+    @keyframes xpPulse {
+      0% { transform: translateY(10px) scale(0.98); }
+      40% { transform: translateY(0) scale(1.02); }
+      100% { transform: translateY(0) scale(1); }
+    }
+
+    @keyframes unlockPop {
+      0% { transform: scale(0.96); }
+      55% { transform: scale(1.03); }
+      100% { transform: scale(1); }
+    }
+
+    @media (max-width: 1024px) {
+      .hero, .content, .landing-hero, .admin-grid { grid-template-columns: 1fr; }
+      .brand-copy p { max-width: 52vw; }
+    }
+
+    @media (max-width: 720px) {
+      .topbar-inner {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 12px 0;
+      }
+      .topbar-actions { width: 100%; justify-content: space-between; }
+      .shell { width: min(100% - 16px, var(--max)); }
+      .topbar-inner { width: min(100% - 16px, var(--max)); }
+      .panel { padding: 18px; border-radius: 18px; }
+      .stats, .grid-2, .grid-3, .kpi-grid, .features-grid, .personas-grid, .badge-grid, .landing-hero, .map-grid, .progress-steps, .skeleton-grid, .explore-grid, .mission-toolbar, .explore-toolbar {
+        grid-template-columns: 1fr;
+      }
+      .hero h2 { max-width: none; }
+      .tabbar-wrap { display: none; }
+      .bottom-nav { display: block; }
+      .brand-copy p { max-width: 100%; }
+      .action-row > * , .hero-actions > * { flex: 1 1 auto; }
+      .btn { width: 100%; }
+      .stats { grid-template-columns: repeat(2, 1fr); }
+      .progress-ring { margin-inline: auto; }
+    }
+
+    @media (max-width: 430px) {
+      .stats { grid-template-columns: 1fr; }
+      .panel { padding: 16px; }
+      .btn, .chip, .sort-chip { padding: 10px 12px; }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar" id="topbar">
+    <div class="topbar-inner">
+      <div class="brand">
+        <div class="brand-badge">A</div>
+        <div class="brand-copy">
+          <h1>ALPIS ImpactPath</h1>
+          <p id="brandSubtitle"></p>
+        </div>
+      </div>
+      <div class="topbar-actions">
+        <button class="btn ghost" id="themeBtn"></button>
+        <button class="btn ghost" id="shareProfileBtn"></button>
+        <button class="btn ghost" id="langBtn">EN</button>
+        <button class="btn ghost" id="demoFillBtn"></button>
+        <button class="btn ghost" id="resetBtn"></button>
+      </div>
+    </div>
+  </header>
+
+  <main class="shell" id="appShell">
+    <section class="hero">
+      <article class="panel hero-card">
+        <div>
+          <div class="eyebrow" id="eyebrow"></div>
+          <h2 id="heroTitle"></h2>
+          <p id="heroDesc"></p>
+          <div class="autosave" id="autosaveIndicator">
+            <span class="autosave-dot"></span>
+            <span id="autosaveText"></span>
+          </div>
+        </div>
+        <div class="hero-actions">
+          <a href="#onboarding" class="btn primary" id="heroPrimary"></a>
+          <a href="#landing" class="btn ghost" id="heroSecondary"></a>
+        </div>
+      </article>
+
+      <aside class="panel">
+        <div class="section-title">
+          <div>
+            <h3 id="metricsTitle"></h3>
+            <p id="metricsDesc"></p>
+          </div>
+        </div>
+        <div class="stats">
+          <div class="stat"><strong id="careerCount">3</strong><span id="statCareers"></span></div>
+          <div class="stat"><strong id="missionCount">6</strong><span id="statMissions"></span></div>
+          <div class="stat"><strong id="xpCount">0 XP</strong><span id="statXp"></span></div>
+          <div class="stat"><strong id="levelValue">L1</strong><span id="statLevel"></span></div>
+        </div>
+      </aside>
+    </section>
+
+    <div class="tabbar-wrap">
+      <nav class="tabbar" id="tabbar"></nav>
+    </div>
+
+    <section class="content">
+      <div class="stack">
+        <article class="panel" id="onboarding">
+          <div class="section-title">
+            <div>
+              <h3 id="onboardingTitle"></h3>
+              <p id="onboardingDesc"></p>
+            </div>
+          </div>
+
+          <div class="progress-steps" id="stepper"></div>
+          <div id="stepContent" style="margin-top:14px;"></div>
+          <div class="helper" id="skillGapBox"></div>
+
+          <div class="action-row" style="margin-top:16px;">
+            <button class="btn ghost" id="prevStepBtn"></button>
+            <button class="btn ghost" id="sampleBtn"></button>
+            <button class="btn primary" id="nextStepBtn"></button>
+          </div>
+        </article>
+
+        <article class="panel" id="results">
+          <div class="section-title">
+            <div>
+              <h3 id="resultsTitle"></h3>
+              <p id="resultsDesc"></p>
+            </div>
+            <div class="mini-row">
+              <button class="btn ghost" id="explainBtn"></button>
+              <button class="btn ghost" id="viewAllDirectionsBtn"></button>
+            </div>
+          </div>
+
+          <div class="explore-toolbar">
+            <input id="careerSearchInput" />
+            <select id="careerDomainFilter"></select>
+          </div>
+
+          <div class="skeleton-grid hidden" id="resultsSkeleton"></div>
+          <div class="result-list" id="resultsList"></div>
+          <div class="explore-grid hidden" id="exploreGrid" style="margin-top:14px;"></div>
+        </article>
+
+        <article class="panel" id="missions">
+          <div class="section-title">
+            <div>
+              <h3 id="missionsTitle"></h3>
+              <p id="missionsDesc"></p>
+            </div>
+          </div>
+
+          <div class="mission-toolbar">
+            <input id="missionSearchInput" />
+            <select id="missionSortSelect"></select>
+          </div>
+
+          <div class="filters" id="missionFilters"></div>
+          <div class="mission-list" id="missionList" style="margin-top:14px;"></div>
+        </article>
+
+        <article class="panel" id="profile">
+          <div class="section-title">
+            <div>
+              <h3 id="profileTitle"></h3>
+              <p id="profileDesc"></p>
+            </div>
+          </div>
+          <div class="share-banner" id="shareBanner"></div>
+          <div class="grid-2" style="margin-top:14px;">
+            <div class="card">
+              <div class="result-head">
+                <div>
+                  <strong id="publicProfileTitle"></strong>
+                  <div class="small" id="publicProfileSubtitle"></div>
+                </div>
+                <span class="level" id="profileVisibility"></span>
+              </div>
+              <div id="publicProfileContent"></div>
+              <div class="action-row" style="margin-top:14px;">
+                <button class="btn primary" id="copyProfileBtn"></button>
+                <button class="btn ghost" id="exportJsonBtn"></button>
+              </div>
+            </div>
+            <div class="card">
+              <strong id="cvTitle"></strong>
+              <p class="small" id="cvDesc"></p>
+              <div id="cvPreview"></div>
+              <div class="action-row" style="margin-top:14px;">
+                <button class="btn ghost" id="copyCvBtn"></button>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <article class="panel" id="admin">
+          <div class="section-title">
+            <div>
+              <h3 id="adminTitle"></h3>
+              <p id="adminDesc"></p>
+            </div>
+          </div>
+
+          <div class="admin-grid">
+            <div class="admin-card">
+              <strong id="adminAddMissionTitle"></strong>
+              <div class="grid-2" style="margin-top:14px;">
+                <label>
+                  <span id="adminMissionTitleLabel"></span>
+                  <input id="adminMissionTitleInput" />
+                </label>
+                <label>
+                  <span id="adminMissionOrgLabel"></span>
+                  <input id="adminMissionOrgInput" />
+                </label>
+                <label>
+                  <span id="adminMissionCityLabel"></span>
+                  <input id="adminMissionCityInput" />
+                </label>
+                <label>
+                  <span id="adminMissionDomainLabel"></span>
+                  <select id="adminMissionDomainSelect"></select>
+                </label>
+                <label>
+                  <span id="adminMissionModeLabel"></span>
+                  <select id="adminMissionModeSelect"></select>
+                </label>
+                <label>
+                  <span id="adminMissionLevelLabel"></span>
+                  <select id="adminMissionLevelSelect"></select>
+                </label>
+                <label>
+                  <span id="adminMissionXpLabel"></span>
+                  <input id="adminMissionXpInput" type="number" min="5" step="1" />
+                </label>
+              </div>
+              <label style="margin-top:14px; display:block;">
+                <span id="adminMissionDescLabel"></span>
+                <textarea id="adminMissionDescInput"></textarea>
+              </label>
+              <div class="action-row" style="margin-top:14px;">
+                <button class="btn primary" id="adminAddMissionBtn"></button>
+              </div>
+            </div>
+
+            <div class="admin-card">
+              <div class="grid-3">
+                <div class="mini-stat"><strong id="adminTotalMissions"></strong><span id="adminTotalMissionsLabel"></span></div>
+                <div class="mini-stat"><strong id="adminCompletedMissions"></strong><span id="adminCompletedMissionsLabel"></span></div>
+                <div class="mini-stat"><strong id="adminSavedMissions"></strong><span id="adminSavedMissionsLabel"></span></div>
+              </div>
+              <div class="admin-list" id="adminMissionList"></div>
+            </div>
+          </div>
+        </article>
+      </div>
+
+      <div class="stack">
+        <article class="panel" id="roadmap">
+          <div class="section-title">
+            <div>
+              <h3 id="roadmapTitle"></h3>
+              <p id="roadmapDesc"></p>
+            </div>
+          </div>
+          <div class="roadmap-list" id="roadmapList"></div>
+        </article>
+
+        <article class="panel" id="progress">
+          <div class="section-title">
+            <div>
+              <h3 id="progressTitle"></h3>
+              <p id="progressDesc"></p>
+            </div>
+          </div>
+
+          <div class="ring-wrap">
+            <div class="progress-ring">
+              <svg viewBox="0 0 120 120" aria-hidden="true">
+                <circle cx="60" cy="60" r="48" stroke="var(--ring-track)" stroke-width="10" fill="none"></circle>
+                <circle id="ringProgress" cx="60" cy="60" r="48" stroke="url(#ringGradient)" stroke-width="10" stroke-linecap="round" fill="none" stroke-dasharray="301.59" stroke-dashoffset="301.59"></circle>
+                <defs>
+                  <linearGradient id="ringGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="var(--accent)"></stop>
+                    <stop offset="100%" stop-color="var(--primary)"></stop>
+                  </linearGradient>
+                </defs>
+              </svg>
+              <div class="ring-label">
+                <div>
+                  <div class="ring-number" id="ringPercent">0%</div>
+                  <div class="ring-caption" id="ringCaption"></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="kpi-grid" style="flex:1;">
+              <div class="kpi"><strong id="progressXp"></strong><span id="progressXpLabel"></span></div>
+              <div class="kpi"><strong id="progressDone"></strong><span id="progressDoneLabel"></span></div>
+            </div>
+          </div>
+
+          <div class="xp-bar"><div class="xp-fill" id="xpFill"></div></div>
+          <div class="small" id="xpMeta" style="margin-top:8px;"></div>
+          <div id="progressPortfolio" style="margin-top:14px;"></div>
+        </article>
+
+        <article class="panel" id="badges">
+          <div class="section-title">
+            <div>
+              <h3 id="badgesTitle"></h3>
+              <p id="badgesDesc"></p>
+            </div>
+          </div>
+          <div class="badge-grid" id="badgeGrid"></div>
+        </article>
+
+        <article class="panel" id="map">
+          <div class="section-title">
+            <div>
+              <h3 id="mapTitle"></h3>
+              <p id="mapDesc"></p>
+            </div>
+          </div>
+          <div class="map-grid">
+            <div>
+              <div class="pins" id="pinList"></div>
+            </div>
+            <div>
+              <div class="result-card" id="mapDetails"></div>
+            </div>
+          </div>
+        </article>
+
+        <article class="panel" id="journal">
+          <div class="section-title">
+            <div>
+              <h3 id="journalTitle"></h3>
+              <p id="journalDesc"></p>
+            </div>
+          </div>
+          <label>
+            <span id="journalPrompt"></span>
+            <textarea id="journalInput"></textarea>
+          </label>
+          <div class="action-row">
+            <button class="btn primary" id="saveJournalBtn"></button>
+            <button class="btn ghost" id="linkedinBtn"></button>
+          </div>
+          <div id="linkedinDraft" class="result-card" style="margin-top:14px;"></div>
+          <div class="journal-list" id="journalList" style="margin-top:14px;"></div>
+        </article>
+      </div>
+    </section>
+
+    <section class="panel" id="landing" style="margin-top:18px;">
+      <div class="section-title">
+        <div>
+          <h3 id="landingTitle"></h3>
+          <p id="landingDesc"></p>
+        </div>
+      </div>
+
+      <div class="landing-hero">
+        <div class="card">
+          <div class="eyebrow" id="landingEyebrow"></div>
+          <h2 id="landingHeroTitle" style="max-width:16ch; margin:14px 0 12px;"></h2>
+          <p class="muted" id="landingHeroDesc"></p>
+          <div class="hero-actions" style="margin-top:16px;">
+            <button class="btn primary" id="waitlistBtn"></button>
+            <button class="btn ghost" id="watchDemoBtn"></button>
+          </div>
+        </div>
+        <div class="card">
+          <strong id="personasTitle"></strong>
+          <div class="personas-grid" id="personasGrid" style="margin-top:14px;"></div>
+        </div>
+      </div>
+
+      <div class="section-title" style="margin-top:18px;">
+        <div>
+          <h3 id="featuresTitle"></h3>
+          <p id="featuresDesc"></p>
+        </div>
+      </div>
+      <div class="features-grid" id="landingFeatures"></div>
+
+      <div class="section-title" style="margin-top:18px;">
+        <div>
+          <h3 id="testimonialsTitle"></h3>
+          <p id="testimonialsDesc"></p>
+        </div>
+      </div>
+      <div class="testimonials" id="testimonialsList"></div>
+
+      <div class="footer-cta" id="footerNote" style="margin-top:18px; text-align:center; color:var(--muted);"></div>
+    </section>
+  </main>
+
+  <section class="readonly-shell hidden" id="readonlyView">
+    <div class="readonly-card">
+      <div class="readonly-head">
+        <div>
+          <div class="eyebrow" id="readonlyEyebrow"></div>
+          <h2 id="readonlyName" style="margin:14px 0 10px;"></h2>
+          <p class="muted" id="readonlyRole"></p>
+        </div>
+        <button class="btn ghost" id="exitReadonlyBtn"></button>
+      </div>
+      <div id="readonlyProfileBody"></div>
+    </div>
+  </section>
+
+  <nav class="bottom-nav">
+    <div class="bottom-nav-inner" id="bottomNav"></div>
+  </nav>
+
+  <div class="toast" id="toast"></div>
+
+  <div class="modal-backdrop" id="missionModalBackdrop">
+    <div class="modal">
+      <div class="modal-head">
+        <div>
+          <h3 id="missionModalTitle" style="margin:0;"></h3>
+          <div class="small" id="missionModalMeta" style="margin-top:6px;"></div>
+        </div>
+        <button class="close-btn" id="closeMissionModal">✕</button>
+      </div>
+      <div id="missionModalBody"></div>
+    </div>
+  </div>
+
+  <script>
+    const copy = {
+      ro: {
+        brandSubtitle: 'Career AI + Community Impact',
+        eyebrow: 'MVP Demo · orientare în carieră + experiență reală',
+        heroTitle: 'Descoperă-ți direcția. Construiește skill-uri. Creează impact.',
+        heroDesc: 'Versiune extinsă: search, sort, progress ring, profile shareable, explore mode, mission modal, admin și logică mai realistă.',
+        heroPrimary: 'Începe onboarding-ul',
+        heroSecondary: 'Vezi landing page',
+        metricsTitle: 'Snapshot produs',
+        metricsDesc: 'Un MVP single-page care combină matching de carieră, misiuni reale, portofoliu și un concept de startup landing.',
+        statCareers: 'direcții recomandate / explorabile',
+        statMissions: 'misiuni locale și remote disponibile',
+        statXp: 'XP acumulat',
+        statLevel: 'nivel curent',
+        tabs: ['Onboarding','Rezultate AI','Misiuni','Profil','Admin','Roadmap','Progres','Badge-uri','Hartă','Jurnal','Landing'],
+        bottomTabs: ['Start','Rezultate','Misiuni','Progres','Landing'],
+        onboardingTitle: '1. Onboarding în pași',
+        onboardingDesc: 'Flow mai clar pentru mobil: profil, stil de lucru, interese și nivel de experiență.',
+        steps: ['Profil','Preferințe','Interese','Experiență'],
+        prevStepBtn: 'Pas înapoi',
+        nextStepBtn: 'Continuă',
+        generateBtn: 'Generează recomandări',
+        sampleBtn: 'Completează exemplu',
+        demoFillBtn: 'Rulează demo-ul',
+        resetBtn: 'Resetează datele',
+        labelName: 'Prenume',
+        labelGoal: 'Ce vrei să obții?',
+        labelPreference: 'Preferi să lucrezi mai ales cu...',
+        preferences: ['tehnologie și logică','oameni și comunicare','creativitate și vizual','natură și acțiune'],
+        labelInterests: 'Interese principale',
+        labelSkills: 'Skill-uri actuale',
+        labelExperience: 'Nivel curent',
+        experience: ['începător','intermediar','avansat'],
+        goalOptions: ['explorare carieră','portofoliu','voluntariat','schimbare de direcție'],
+        interestsPlaceholder: 'ex: AI, educație, design, sustenabilitate',
+        skillsPlaceholder: 'ex: comunicare, Figma, Excel, JavaScript',
+        namePlaceholder: 'ex: Mara',
+        sampleName: 'Mara',
+        sampleInterests: 'educație, design, tehnologie civică',
+        sampleSkills: 'comunicare, Canva, research',
+        resultsTitle: '2. Rezultate AI',
+        resultsDesc: 'Scoring simplu pentru MVP, explicații clare, skill gap și explore mode pentru toate direcțiile.',
+        explainBtn: 'Explică scorurile',
+        viewAllDirectionsBtn: 'Vezi toate direcțiile',
+        emptyResults: 'Apasă pe „Generează recomandări” ca să vezi cele mai potrivite 3 direcții.',
+        fitScore: 'potrivire',
+        whyFits: 'De ce se potrivește',
+        skillGapTitle: 'Skill gap estimat',
+        skillGapEmpty: 'După ce completezi onboarding-ul, aici apar skill-urile de dezvoltat.',
+        roadmapTitle: '3. Roadmap personal',
+        roadmapDesc: 'Recomandarea principală devine un plan clar de învățare, proiect și experiență reală.',
+        emptyRoadmap: 'Generează mai întâi o carieră recomandată.',
+        roadmapSteps: ['Învață bazele','Construiește un mini-proiect','Aplică într-o misiune reală','Publică progresul în portofoliu'],
+        roadmapMicro: ['video / resurse recomandate','proiect practic de 2-3 ore','experiență de impact în comunitate','postare LinkedIn + profil public'],
+        missionsTitle: '4. Misiuni reale',
+        missionsDesc: 'Search, filtre, sort, favorite, detalii și acțiuni clare pentru experiență practică.',
+        filters: ['Toate','Tech','Design','Educație','Sănătate','Mediu','Favorite'],
+        missionLocal: 'Local',
+        missionRemote: 'Remote',
+        missionSelect: 'Vezi pe hartă',
+        missionComplete: 'Finalizează',
+        missionApply: 'Apply / Join',
+        missionSave: 'Salvează',
+        missionSaved: 'Salvată',
+        missionSearchPlaceholder: 'Caută după oraș, ONG sau titlu',
+        missionSortDefault: 'Sortează',
+        missionSortXp: 'XP desc',
+        missionSortLevel: 'Nivel',
+        missionSortMode: 'Remote / Local',
+        missionEmpty: 'Nu există misiuni pentru această combinație. Încearcă alt filtru sau alt search.',
+        mapTitle: '8. Hartă de oportunități',
+        mapDesc: 'Vizualizare simplă a organizațiilor și misiunilor disponibile.',
+        mapEmptyTitle: 'Detalii locație',
+        mapEmptyBody: 'Selectează un pin sau o misiune pentru detalii.',
+        progressTitle: '6. Progres și portofoliu',
+        progressDesc: 'XP, nivel, streak și misiuni finalizate construiesc portofoliul utilizatorului.',
+        progressXpLabel: 'XP total',
+        progressDoneLabel: 'misiuni finalizate',
+        xpMeta: 'Următorul nivel la',
+        ringCaption: 'spre next level',
+        noActivity: 'Nu există activitate încă. Finalizează prima misiune ca să pornești portofoliul.',
+        completedPortfolio: 'Misiuni finalizate',
+        badgesTitle: '7. Badge-uri și milestones',
+        badgesDesc: 'Gamification simplă pentru engagement și motivație.',
+        journalTitle: '9. Product journal',
+        journalDesc: 'Spațiu pentru idei, lecții și progres — util pentru storytelling și LinkedIn.',
+        journalPrompt: 'Ce ai construit azi?',
+        journalPlaceholder: 'Am testat onboarding-ul, am comparat scorurile și am notat ce aș îmbunătăți pentru utilizatorii noi.',
+        saveJournalBtn: 'Salvează intrarea',
+        linkedinBtn: 'Generează draft LinkedIn',
+        linkedinTitle: 'Draft LinkedIn',
+        linkedinEmpty: 'Se bazează pe ultima intrare din jurnal și pe progresul din aplicație.',
+        journalEmpty: 'Nu ai încă intrări. Scrie prima reflecție despre progresul tău.',
+        entrySaved: 'Intrare salvată.',
+        profileTitle: '5. Profil public și CV draft',
+        profileDesc: 'Un profil shareable și un mini-CV generat automat din progres și experiență.',
+        publicProfileTitle: 'Profil public ALPIS',
+        publicProfileSubtitle: 'Preview gata de distribuit',
+        profileVisibility: 'public demo',
+        copyProfileBtn: 'Copiază profilul',
+        exportJsonBtn: 'Exportă JSON',
+        cvTitle: 'Mini CV / Bio draft',
+        cvDesc: 'Text scurt pe care îl poți trimite către ONG-uri, programe sau parteneri.',
+        copyCvBtn: 'Copiază CV-ul',
+        shareProfileBtn: 'Share profile',
+        shareBanner: 'Link shareable:',
+        readonlyEyebrow: 'Profil public shareable',
+        exitReadonlyBtn: 'Ieși din preview',
+        landingTitle: '10. Landing page concept',
+        landingDesc: 'Flow mai convingător: problemă, soluție, audiențe, beneficii și proof points.',
+        landingEyebrow: 'For students, early talent and mission-driven organizations',
+        landingHeroTitle: 'Career discovery that turns into real-world experience.',
+        landingHeroDesc: 'ALPIS ImpactPath helps young people discover relevant career paths, build skills and complete meaningful missions.',
+        waitlistBtn: 'Join waitlist',
+        watchDemoBtn: 'Watch demo',
+        personasTitle: 'Pentru cine este',
+        personas: [
+          ['Elevi / studenți','explorare de direcție'],
+          ['Tineri profesioniști','portofoliu și experiență'],
+          ['ONG-uri și parteneri','talent + misiuni']
+        ],
+        featuresTitle: 'De ce contează',
+        featuresDesc: 'Valoare clară pentru user și pentru ecosistem.',
+        features: [
+          ['Career matching','Recomandări clare, explicabile și orientate pe potențial.'],
+          ['Skill gap','Vezi ce competențe trebuie dezvoltate pentru următorul pas.'],
+          ['Volunteer missions','Aplici imediat ceea ce înveți în contexte reale.'],
+          ['Portfolio builder','Progresul devine dovadă de lucru și impact.'],
+          ['Gamification','XP, badge-uri și milestones pentru retenție.'],
+          ['Partner layer','Organizațiile pot publica misiuni și găsi tineri potriviți.']
+        ],
+        testimonialsTitle: 'Testimoniale demo',
+        testimonialsDesc: 'Exemple de social proof pentru landing page.',
+        testimonials: [
+          ['Studentă, Cluj','În sfârșit un produs care îmi arată nu doar ce mi s-ar potrivi, ci și ce pot face concret.'],
+          ['NGO partner','Ne-ar ajuta să găsim voluntari mai bine pregătiți și mai motivați.'],
+          ['Mentor','Îmi place că transformă orientarea în carieră în experiență practică și portofoliu.']
+        ],
+        footerNote: 'Single-file MVP · HTML, CSS și JavaScript vanilla · localStorage · export JSON · RO/EN · dark/light · shareable profile',
+        skillGapLabel: 'Îți lipsesc mai ales',
+        missionDoneToast: 'Misiune finalizată. XP actualizat.',
+        copiedToast: 'Copiat în clipboard.',
+        exportedToast: 'Fișier exportat.',
+        localeLabel: 'RO',
+        resultsThinking: 'Analizăm profilul tău și generăm direcțiile cele mai potrivite...',
+        themeLight: 'Light',
+        themeDark: 'Dark',
+        autosaveSaved: 'Salvat automat ✓',
+        exploreSearchPlaceholder: 'Caută direcții după titlu, motiv sau tag',
+        exploreAllDomains: 'Toate domeniile',
+        missionModalSkills: 'Skill-uri dobândite',
+        missionModalImpact: 'Impact real',
+        missionModalExtended: 'Descriere extinsă',
+        adminTitle: '11. Mini admin panel',
+        adminDesc: 'Demo pentru partea B2B / operator: adaugă misiuni și urmărește metrici simple.',
+        adminAddMissionTitle: 'Adaugă misiune',
+        adminMissionTitleLabel: 'Titlu',
+        adminMissionOrgLabel: 'ONG / organizație',
+        adminMissionCityLabel: 'Oraș',
+        adminMissionDomainLabel: 'Domeniu',
+        adminMissionModeLabel: 'Mod',
+        adminMissionLevelLabel: 'Nivel',
+        adminMissionXpLabel: 'XP',
+        adminMissionDescLabel: 'Descriere',
+        adminAddMissionBtn: 'Adaugă misiune',
+        adminTotalMissionsLabel: 'misiuni totale',
+        adminCompletedMissionsLabel: 'completate',
+        adminSavedMissionsLabel: 'salvate',
+        adminMissionAdded: 'Misiune adăugată.',
+        readonlyRoleFallback: 'Explorer',
+        explainBreakdownTitle: 'Breakdown scor',
+        levelOrder: ['începător','intermediar','avansat'],
+        modeOptions: ['remote','local'],
+        linkedinTemplate: (name, missionCount, xp, entry) => `Astăzi am lucrat la ${name ? 'ALPIS ImpactPath' : 'un MVP de orientare în carieră'} și am făcut un pas înainte spre un produs care combină AI, învățare și impact real.\n\nAm documentat progresul în jurnal, am explorat ${missionCount} misiuni și am ajuns la ${xp} XP.\n\nCea mai utilă lecție de azi: ${entry || 'să transform feedback-ul din onboarding în acțiuni clare pentru utilizatori.'}\n\n#productdesign #careertech #impactstartup`
+      },
+      en: {
+        brandSubtitle: 'Career AI + Community Impact',
+        eyebrow: 'MVP Demo · career guidance + real-world experience',
+        heroTitle: 'Discover your direction. Build skills. Create impact.',
+        heroDesc: 'Expanded version: search, sort, progress ring, shareable profile, explore mode, mission modal, admin, and more realistic product logic.',
+        heroPrimary: 'Start onboarding',
+        heroSecondary: 'View landing page',
+        metricsTitle: 'Product snapshot',
+        metricsDesc: 'A single-page MVP that combines career matching, real missions, portfolio growth, and a startup landing concept.',
+        statCareers: 'recommended / explorable paths',
+        statMissions: 'local and remote missions available',
+        statXp: 'XP earned',
+        statLevel: 'current level',
+        tabs: ['Onboarding','AI results','Missions','Profile','Admin','Roadmap','Progress','Badges','Map','Journal','Landing'],
+        bottomTabs: ['Start','Results','Missions','Progress','Landing'],
+        onboardingTitle: '1. Step-by-step onboarding',
+        onboardingDesc: 'A clearer mobile flow for profile, work style, interests, and current level.',
+        steps: ['Profile','Preferences','Interests','Experience'],
+        prevStepBtn: 'Back',
+        nextStepBtn: 'Continue',
+        generateBtn: 'Generate recommendations',
+        sampleBtn: 'Fill sample',
+        demoFillBtn: 'Run demo',
+        resetBtn: 'Reset data',
+        labelName: 'First name',
+        labelGoal: 'What do you want to achieve?',
+        labelPreference: 'You prefer working mostly with...',
+        preferences: ['technology and logic','people and communication','creativity and visual work','nature and action'],
+        labelInterests: 'Main interests',
+        labelSkills: 'Current skills',
+        labelExperience: 'Current level',
+        experience: ['beginner','intermediate','advanced'],
+        goalOptions: ['career exploration','portfolio','volunteering','direction change'],
+        interestsPlaceholder: 'e.g. AI, education, design, sustainability',
+        skillsPlaceholder: 'e.g. communication, Figma, Excel, JavaScript',
+        namePlaceholder: 'e.g. Maya',
+        sampleName: 'Maya',
+        sampleInterests: 'education, design, civic tech',
+        sampleSkills: 'communication, Canva, research',
+        resultsTitle: '2. AI results',
+        resultsDesc: 'Simple MVP scoring, clear explanations, skill gap, and an explore mode across all directions.',
+        explainBtn: 'Explain scores',
+        viewAllDirectionsBtn: 'View all paths',
+        emptyResults: 'Click “Generate recommendations” to see the 3 best matching directions.',
+        fitScore: 'fit score',
+        whyFits: 'Why it fits',
+        skillGapTitle: 'Estimated skill gap',
+        skillGapEmpty: 'After onboarding, this area shows the skills you should develop next.',
+        roadmapTitle: '3. Personal roadmap',
+        roadmapDesc: 'The top recommendation becomes a clear learning, project, and real-world experience plan.',
+        emptyRoadmap: 'Generate a recommended career first.',
+        roadmapSteps: ['Learn the fundamentals','Build a mini-project','Apply to a real mission','Publish progress in your portfolio'],
+        roadmapMicro: ['video / learning resources','2-3 hour hands-on project','community impact experience','LinkedIn post + public profile'],
+        missionsTitle: '4. Real missions',
+        missionsDesc: 'Search, filters, sort, favorites, richer details, and clear actions for practical experience.',
+        filters: ['All','Tech','Design','Education','Health','Environment','Saved'],
+        missionLocal: 'Local',
+        missionRemote: 'Remote',
+        missionSelect: 'View on map',
+        missionComplete: 'Complete',
+        missionApply: 'Apply / Join',
+        missionSave: 'Save',
+        missionSaved: 'Saved',
+        missionSearchPlaceholder: 'Search by city, NGO or title',
+        missionSortDefault: 'Sort',
+        missionSortXp: 'XP desc',
+        missionSortLevel: 'Level',
+        missionSortMode: 'Remote / Local',
+        missionEmpty: 'No missions match this combination. Try another filter or search.',
+        mapTitle: '8. Opportunity map',
+        mapDesc: 'A simple view of organizations and available missions.',
+        mapEmptyTitle: 'Location details',
+        mapEmptyBody: 'Select a pin or a mission to see details.',
+        progressTitle: '6. Progress and portfolio',
+        progressDesc: 'XP, level, streak, and completed missions build the user portfolio.',
+        progressXpLabel: 'total XP',
+        progressDoneLabel: 'missions completed',
+        xpMeta: 'Next level at',
+        ringCaption: 'to next level',
+        noActivity: 'No activity yet. Complete your first mission to start the portfolio.',
+        completedPortfolio: 'Completed missions',
+        badgesTitle: '7. Badges and milestones',
+        badgesDesc: 'Simple gamification for engagement and motivation.',
+        journalTitle: '9. Product journal',
+        journalDesc: 'A space for ideas, lessons, and progress — useful for storytelling and LinkedIn.',
+        journalPrompt: 'What did you build today?',
+        journalPlaceholder: 'I tested the onboarding flow, compared the scores, and noted what I would improve for first-time users.',
+        saveJournalBtn: 'Save entry',
+        linkedinBtn: 'Generate LinkedIn draft',
+        linkedinTitle: 'LinkedIn draft',
+        linkedinEmpty: 'Based on the latest journal entry and your current product progress.',
+        journalEmpty: 'No entries yet. Write your first reflection about your progress.',
+        entrySaved: 'Entry saved.',
+        profileTitle: '5. Public profile and CV draft',
+        profileDesc: 'A shareable profile plus a mini CV generated from your progress and experience.',
+        publicProfileTitle: 'ALPIS public profile',
+        publicProfileSubtitle: 'A preview ready to share',
+        profileVisibility: 'public demo',
+        copyProfileBtn: 'Copy profile',
+        exportJsonBtn: 'Export JSON',
+        cvTitle: 'Mini CV / Bio draft',
+        cvDesc: 'A short text you can send to nonprofits, programs, or partners.',
+        copyCvBtn: 'Copy CV',
+        shareProfileBtn: 'Share profile',
+        shareBanner: 'Shareable link:',
+        readonlyEyebrow: 'Shareable public profile',
+        exitReadonlyBtn: 'Exit preview',
+        landingTitle: '10. Landing page concept',
+        landingDesc: 'A more convincing flow: problem, solution, audiences, benefits, and proof points.',
+        landingEyebrow: 'For students, early talent and mission-driven organizations',
+        landingHeroTitle: 'Career discovery that turns into real-world experience.',
+        landingHeroDesc: 'ALPIS ImpactPath helps young people discover relevant career paths, build skills, and complete meaningful missions.',
+        waitlistBtn: 'Join waitlist',
+        watchDemoBtn: 'Watch demo',
+        personasTitle: 'Who it is for',
+        personas: [
+          ['Students','direction discovery'],
+          ['Early professionals','portfolio and experience'],
+          ['NGOs and partners','talent + missions']
+        ],
+        featuresTitle: 'Why it matters',
+        featuresDesc: 'Clear value for the user and the ecosystem.',
+        features: [
+          ['Career matching','Clear and explainable recommendations focused on potential.'],
+          ['Skill gap','See which capabilities you need for the next step.'],
+          ['Volunteer missions','Apply what you learn in real contexts immediately.'],
+          ['Portfolio builder','Progress becomes evidence of work and impact.'],
+          ['Gamification','XP, badges, and milestones improve retention.'],
+          ['Partner layer','Organizations can publish missions and find suitable young talent.']
+        ],
+        testimonialsTitle: 'Demo testimonials',
+        testimonialsDesc: 'Examples of social proof for the landing page.',
+        testimonials: [
+          ['Student, Cluj','Finally a product that shows me not only what fits me, but also what I can actually do next.'],
+          ['NGO partner','It would help us find volunteers who are better prepared and more motivated.'],
+          ['Mentor','I like that it turns career guidance into practical experience and portfolio growth.']
+        ],
+        footerNote: 'Single-file MVP · vanilla HTML, CSS and JavaScript · localStorage · JSON export · RO/EN · dark/light · shareable profile',
+        skillGapLabel: 'The biggest growth areas are',
+        missionDoneToast: 'Mission completed. XP updated.',
+        copiedToast: 'Copied to clipboard.',
+        exportedToast: 'File exported.',
+        localeLabel: 'EN',
+        resultsThinking: 'Analyzing your profile and generating the most relevant directions...',
+        themeLight: 'Light',
+        themeDark: 'Dark',
+        autosaveSaved: 'Auto-saved ✓',
+        exploreSearchPlaceholder: 'Search paths by title, reason or tags',
+        exploreAllDomains: 'All domains',
+        missionModalSkills: 'Skills gained',
+        missionModalImpact: 'Real impact',
+        missionModalExtended: 'Extended description',
+        adminTitle: '11. Mini admin panel',
+        adminDesc: 'A demo B2B / operator layer: add missions and monitor simple metrics.',
+        adminAddMissionTitle: 'Add mission',
+        adminMissionTitleLabel: 'Title',
+        adminMissionOrgLabel: 'NGO / organization',
+        adminMissionCityLabel: 'City',
+        adminMissionDomainLabel: 'Domain',
+        adminMissionModeLabel: 'Mode',
+        adminMissionLevelLabel: 'Level',
+        adminMissionXpLabel: 'XP',
+        adminMissionDescLabel: 'Description',
+        adminAddMissionBtn: 'Add mission',
+        adminTotalMissionsLabel: 'total missions',
+        adminCompletedMissionsLabel: 'completed',
+        adminSavedMissionsLabel: 'saved',
+        adminMissionAdded: 'Mission added.',
+        readonlyRoleFallback: 'Explorer',
+        explainBreakdownTitle: 'Score breakdown',
+        levelOrder: ['beginner','intermediate','advanced'],
+        modeOptions: ['remote','local'],
+        linkedinTemplate: (name, missionCount, xp, entry) => `Today I worked on ${name ? 'ALPIS ImpactPath' : 'a career discovery MVP'} and moved one step closer to a product that combines AI, learning, and real-world impact.\n\nI documented progress in the journal, explored ${missionCount} missions, and reached ${xp} XP.\n\nMy biggest learning today: ${entry || 'turning onboarding feedback into clear next actions for users.'}\n\n#productdesign #careertech #impactstartup`
+      }
+    };
+
+    const careerCatalog = [
+      {
+        id: 'ux', domain: 'Design', xp: 35,
+        tags: ['design','research','ui','ux','creativitate','figma'],
+        gaps: ['UX research','wireframing','portfolio case study'],
+        ro: { title: 'UX Designer pentru impact civic', reason: 'Combini empatia, claritatea și creativitatea pentru produse utile comunității.' },
+        en: { title: 'Civic impact UX designer', reason: 'You combine empathy, clarity, and creativity to design useful products for communities.' }
+      },
+      {
+        id: 'pm', domain: 'Tech', xp: 40,
+        tags: ['product','strategie','tech','ai','organizare'],
+        gaps: ['prioritization','roadmapping','metrics thinking'],
+        ro: { title: 'Product manager în edtech', reason: 'Îți place să conectezi nevoi reale, priorități și rezultate măsurabile.' },
+        en: { title: 'Edtech product manager', reason: 'You enjoy connecting real needs, priorities, and measurable outcomes.' }
+      },
+      {
+        id: 'data', domain: 'Tech', xp: 45,
+        tags: ['date','excel','analytics','logică','dashboard'],
+        gaps: ['data cleaning','dashboarding','insight storytelling'],
+        ro: { title: 'Analist de date pentru ONG-uri', reason: 'Ai logică, structură și interes pentru decizii bazate pe date.' },
+        en: { title: 'Data analyst for nonprofits', reason: 'You show logic, structure, and interest in data-driven decisions.' }
+      },
+      {
+        id: 'community', domain: 'Educație', xp: 30,
+        tags: ['oameni','comunicare','facilitare','educație'],
+        gaps: ['facilitation','event design','feedback loops'],
+        ro: { title: 'Community builder educațional', reason: 'Te motivează relațiile, comunicarea și creșterea altor oameni.' },
+        en: { title: 'Education community builder', reason: 'You are energized by relationships, communication, and helping others grow.' }
+      },
+      {
+        id: 'green', domain: 'Mediu', xp: 38,
+        tags: ['mediu','sustenabilitate','organizare','teren'],
+        gaps: ['community mobilization','field coordination','impact reporting'],
+        ro: { title: 'Coordonator proiecte de mediu', reason: 'Îți place să transformi ideile în acțiuni locale concrete.' },
+        en: { title: 'Environmental project coordinator', reason: 'You like turning ideas into tangible local action.' }
+      },
+      {
+        id: 'health', domain: 'Sănătate', xp: 34,
+        tags: ['wellbeing','empatie','organizare','comunitate'],
+        gaps: ['program design','participant research','session planning'],
+        ro: { title: 'Facilitator programe wellbeing', reason: 'Îți pasă de oameni, structură și experiențe utile în comunitate.' },
+        en: { title: 'Wellbeing program facilitator', reason: 'You care about people, structure, and meaningful community experiences.' }
+      }
+    ];
+
+    const baseMissions = [
+      { id: 1, domain: 'Tech', mode: 'remote', city: 'Bucharest', org: 'Civic Lab', xp: 20, level: 'beginner',
+        skills: ['form UX','user flows','research synthesis'],
+        impact: 'A nonprofit can reduce volunteer signup friction and convert more supporters.',
+        extended: {
+          ro: 'Lucrezi pe un flow simplu, dar relevant, pentru înscrierea voluntarilor și clarifici pașii esențiali.',
+          en: 'You improve a simple but meaningful volunteer onboarding flow and clarify the key user steps.'
+        },
+        ro: { title: 'Prototypează un formular pentru voluntari', desc: 'Ajută un ONG să reducă timpul de înscriere pentru voluntari.' },
+        en: { title: 'Prototype a volunteer sign-up form', desc: 'Help a nonprofit reduce volunteer onboarding time.' }
+      },
+      { id: 2, domain: 'Design', mode: 'remote', city: 'Cluj-Napoca', org: 'Open Studio', xp: 18, level: 'intermediate',
+        skills: ['visual systems','campaign assets','brand consistency'],
+        impact: 'A local campaign becomes easier to recognize and share.',
+        extended: {
+          ro: 'Refaci asset-uri și structură vizuală pentru o campanie socială cu nevoi reale de comunicare.',
+          en: 'You refresh assets and visual structure for a social campaign with real communication needs.'
+        },
+        ro: { title: 'Refă identitatea vizuală a unei campanii', desc: 'Creează asset-uri pentru o inițiativă de impact local.' },
+        en: { title: 'Refresh a campaign visual identity', desc: 'Create assets for a local impact initiative.' }
+      },
+      { id: 3, domain: 'Educație', mode: 'local', city: 'Iași', org: 'Future School', xp: 22, level: 'beginner',
+        skills: ['facilitation','public speaking','feedback collection'],
+        impact: 'Students receive direct guidance and schools gather useful insights.',
+        extended: {
+          ro: 'Co-livrezi un atelier practic, observi participanții și colectezi semnale utile pentru edițiile viitoare.',
+          en: 'You co-deliver a practical workshop, observe participants, and collect useful feedback for future editions.'
+        },
+        ro: { title: 'Susține un atelier de orientare în carieră', desc: 'Co-livrează un atelier pentru liceeni și colectează feedback.' },
+        en: { title: 'Support a career guidance workshop', desc: 'Co-deliver a workshop for high-school students and collect feedback.' }
+      },
+      { id: 4, domain: 'Sănătate', mode: 'local', city: 'Timișoara', org: 'Wellbeing Hub', xp: 16, level: 'beginner',
+        skills: ['interviewing','note-taking','insight mapping'],
+        impact: 'A wellbeing program can better adapt services to community needs.',
+        extended: {
+          ro: 'Vorbim cu participanți, structurăm insight-uri și producem o imagine clară a nevoilor lor.',
+          en: 'You talk to participants, structure insights, and create a clear picture of their needs.'
+        },
+        ro: { title: 'Mapează nevoile unei comunități', desc: 'Intervievează participanți și sintetizează insight-uri utile.' },
+        en: { title: 'Map community needs', desc: 'Interview participants and synthesize useful insights.' }
+      },
+      { id: 5, domain: 'Mediu', mode: 'local', city: 'Brașov', org: 'Green Steps', xp: 24, level: 'intermediate',
+        skills: ['field coordination','community activation','impact recap'],
+        impact: 'A local clean-up initiative becomes easier to coordinate and report.',
+        extended: {
+          ro: 'Coordonezi o acțiune scurtă de teren și documentezi clar rezultatele și participarea.',
+          en: 'You coordinate a short field action and clearly document outcomes and participation.'
+        },
+        ro: { title: 'Coordonează o micro-acțiune de ecologizare', desc: 'Planifică rolurile, mesajele și recapitularea rezultatelor.' },
+        en: { title: 'Coordinate a micro clean-up action', desc: 'Plan roles, messages, and the result recap.' }
+      },
+      { id: 6, domain: 'Tech', mode: 'remote', city: 'Remote', org: 'Data for Good', xp: 26, level: 'advanced',
+        skills: ['data cleaning','documentation','dashboard readiness'],
+        impact: 'Programs can measure outcomes more reliably and tell better impact stories.',
+        extended: {
+          ro: 'Pregătești date brute pentru o utilizare mai sigură într-un dashboard sau raport intern.',
+          en: 'You prepare raw data for more reliable use in a dashboard or internal report.'
+        },
+        ro: { title: 'Curăță un set de date pentru impact social', desc: 'Pregătește un dataset pentru un dashboard de programe.' },
+        en: { title: 'Clean a dataset for social impact', desc: 'Prepare a dataset for a program dashboard.' }
+      }
+    ];
+
+    const badgeCatalog = [
+      { id: 'first_step', emoji: '🚀', threshold: (s) => s.results.length > 0 },
+      { id: 'first_mission', emoji: '✅', threshold: (s) => s.completedMissionIds.length >= 1 },
+      { id: 'impact_builder', emoji: '🌱', threshold: (s) => s.completedMissionIds.length >= 3 },
+      { id: 'journaler', emoji: '✍️', threshold: (s) => s.journal.length >= 2 },
+      { id: 'xp_100', emoji: '🏅', threshold: (s) => s.xp >= 100 },
+      { id: 'collector', emoji: '⭐', threshold: (s) => s.savedMissionIds.length >= 2 }
+    ];
+
+    const badgeNames = {
+      ro: {
+        first_step: ['Primul pas','Ai generat primele recomandări.'],
+        first_mission: ['Prima misiune','Ai finalizat prima experiență practică.'],
+        impact_builder: ['Impact builder','Ai trecut de 3 misiuni finalizate.'],
+        journaler: ['Reflective maker','Ai documentat progresul de cel puțin 2 ori.'],
+        xp_100: ['100 XP','Ai ajuns la primul milestone important.'],
+        collector: ['Mission collector','Ai salvat cel puțin 2 misiuni.']
+      },
+      en: {
+        first_step: ['First step','You generated your first recommendations.'],
+        first_mission: ['First mission','You completed your first practical experience.'],
+        impact_builder: ['Impact builder','You passed 3 completed missions.'],
+        journaler: ['Reflective maker','You documented progress at least twice.'],
+        xp_100: ['100 XP','You reached your first important milestone.'],
+        collector: ['Mission collector','You saved at least 2 missions.']
+      }
+    };
+
+    const defaultState = {
+      locale: 'ro',
+      currentStep: 0,
+      theme: 'dark',
+      profile: {
+        name: '', goal: 0, preference: 0, interests: '', skills: '', experience: 0
+      },
+      results: [],
+      allCareerScores: [],
+      selectedCareer: null,
+      missionFilter: 'All',
+      missionSearch: '',
+      missionSort: 'default',
+      selectedMissionId: null,
+      completedMissionIds: [],
+      savedMissionIds: [],
+      xp: 0,
+      streak: 0,
+      lastActiveDate: null,
+      journal: [],
+      linkedinDraft: '',
+      customMissions: [],
+      careerSearch: '',
+      careerDomain: 'all',
+      exploreMode: false
+    };
+
+    const state = Object.assign({}, defaultState, JSON.parse(localStorage.getItem('alpis-impactpath-v35') || 'null') || {});
+    state.profile = Object.assign({}, defaultState.profile, state.profile || {});
+    state.completedMissionIds = state.completedMissionIds || [];
+    state.savedMissionIds = state.savedMissionIds || [];
+    state.journal = state.journal || [];
+    state.results = state.results || [];
+    state.customMissions = state.customMissions || [];
+    state.allCareerScores = state.allCareerScores || [];
+    state.theme = state.theme || 'dark';
+    state.missionSort = state.missionSort || 'default';
+    state.missionSearch = state.missionSearch || '';
+    state.careerSearch = state.careerSearch || '';
+    state.careerDomain = state.careerDomain || 'all';
+    state.exploreMode = !!state.exploreMode;
+
+    const el = {};
+    [
+      'brandSubtitle','eyebrow','heroTitle','heroDesc','heroPrimary','heroSecondary','metricsTitle','metricsDesc','statCareers','statMissions','statXp','statLevel',
+      'careerCount','missionCount','xpCount','levelValue','tabbar','stepper','stepContent','skillGapBox','prevStepBtn','sampleBtn','nextStepBtn','demoFillBtn','resetBtn',
+      'resultsTitle','resultsDesc','resultsList','resultsSkeleton','explainBtn','viewAllDirectionsBtn','careerSearchInput','careerDomainFilter','exploreGrid',
+      'missionsTitle','missionsDesc','missionFilters','missionList','missionSearchInput','missionSortSelect',
+      'profileTitle','profileDesc','publicProfileTitle','publicProfileSubtitle','profileVisibility','publicProfileContent','copyProfileBtn','exportJsonBtn','cvTitle','cvDesc','cvPreview','copyCvBtn',
+      'roadmapTitle','roadmapDesc','roadmapList','progressTitle','progressDesc','progressXp','progressXpLabel','progressDone','progressDoneLabel','xpFill','xpMeta','progressPortfolio',
+      'badgesTitle','badgesDesc','badgeGrid','mapTitle','mapDesc','pinList','mapDetails','journalTitle','journalDesc','journalPrompt','journalInput','saveJournalBtn','linkedinBtn',
+      'linkedinDraft','journalList','landingTitle','landingDesc','landingEyebrow','landingHeroTitle','landingHeroDesc','waitlistBtn','watchDemoBtn','personasTitle','personasGrid',
+      'featuresTitle','featuresDesc','landingFeatures','testimonialsTitle','testimonialsDesc','testimonialsList','footerNote','langBtn','bottomNav','toast','ringProgress','ringPercent','ringCaption',
+      'themeBtn','shareProfileBtn','shareBanner','autosaveText','readonlyView','appShell','readonlyEyebrow','readonlyName','readonlyRole','readonlyProfileBody','exitReadonlyBtn',
+      'missionModalBackdrop','missionModalTitle','missionModalMeta','missionModalBody','closeMissionModal',
+      'adminTitle','adminDesc','adminAddMissionTitle','adminMissionTitleLabel','adminMissionOrgLabel','adminMissionCityLabel','adminMissionDomainLabel','adminMissionModeLabel',
+      'adminMissionLevelLabel','adminMissionXpLabel','adminMissionDescLabel','adminAddMissionBtn','adminMissionTitleInput','adminMissionOrgInput','adminMissionCityInput','adminMissionDomainSelect',
+      'adminMissionModeSelect','adminMissionLevelSelect','adminMissionXpInput','adminMissionDescInput','adminMissionList','adminTotalMissions','adminCompletedMissions','adminSavedMissions',
+      'adminTotalMissionsLabel','adminCompletedMissionsLabel','adminSavedMissionsLabel'
+    ].forEach(id => el[id] = document.getElementById(id));
+
+    const saveState = () => {
+      localStorage.setItem('alpis-impactpath-v35', JSON.stringify(state));
+      triggerAutosave();
+    };
+
+    const t = (key) => copy[state.locale][key];
+    const normalize = (text) => String(text || '').toLowerCase().normalize('NFD').replace(/\p{Diacritic}/gu, '');
+    const currentLevel = () => Math.floor(state.xp / 50) + 1;
+    const nextLevelXp = () => currentLevel() * 50;
+    const levelProgressXp = () => state.xp % 50;
+    const xpPercent = () => Math.min(100, Math.round(levelProgressXp() / 50 * 100));
+    const missions = () => [...baseMissions, ...state.customMissions];
+
+    function showToast(text, type = '') {
+      el.toast.textContent = text;
+      el.toast.className = `toast show ${type}`.trim();
+      clearTimeout(showToast.timer);
+      showToast.timer = setTimeout(() => {
+        el.toast.className = 'toast';
+      }, 1800);
+    }
+
+    function triggerAutosave() {
+      el.autosaveText.textContent = t('autosaveSaved');
+      clearTimeout(triggerAutosave.timer);
+      triggerAutosave.timer = setTimeout(() => {
+        el.autosaveText.textContent = t('autosaveSaved');
+      }, 1200);
+    }
+
+    async function copyToClipboard(text) {
+      try {
+        await navigator.clipboard.writeText(text);
+        showToast(t('copiedToast'));
+      } catch {
+        showToast('Copy failed');
+      }
+    }
+
+    function downloadFile(filename, content, mime = 'application/json') {
+      const blob = new Blob([content], { type: mime });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      a.click();
+      URL.revokeObjectURL(url);
+      showToast(t('exportedToast'));
+    }
+
+    function renderTabs() {
+      const ids = ['onboarding','results','missions','profile','admin','roadmap','progress','badges','map','journal','landing'];
+      el.tabbar.innerHTML = '';
+      t('tabs').forEach((label, index) => {
+        const a = document.createElement('a');
+        a.className = 'tab-btn';
+        a.href = `#${ids[index]}`;
+        a.textContent = label;
+        if (index === 0) a.classList.add('active');
+        a.addEventListener('click', () => setActiveNav(a.getAttribute('href')));
+        el.tabbar.appendChild(a);
+      });
+      renderBottomNav();
+    }
+
+    function renderBottomNav() {
+      const ids = ['onboarding','results','missions','progress','landing'];
+      el.bottomNav.innerHTML = '';
+      t('bottomTabs').forEach((label, index) => {
+        const a = document.createElement('a');
+        a.href = `#${ids[index]}`;
+        a.textContent = label;
+        if (index === 0) a.classList.add('active');
+        a.addEventListener('click', () => setActiveNav(a.getAttribute('href')));
+        el.bottomNav.appendChild(a);
+      });
+    }
+
+    function setActiveNav(hash) {
+      document.querySelectorAll('.tab-btn, .bottom-nav a').forEach(btn => btn.classList.toggle('active', btn.getAttribute('href') === hash));
+    }
+
+    function applyTheme() {
+      document.body.classList.toggle('theme-light', state.theme === 'light');
+      el.themeBtn.textContent = state.theme === 'dark' ? t('themeLight') : t('themeDark');
+    }
+
+    function renderStatic() {
+      document.documentElement.lang = state.locale;
+      el.langBtn.textContent = copy[state.locale === 'ro' ? 'en' : 'ro'].localeLabel;
+
+      [
+        'brandSubtitle','eyebrow','heroTitle','heroDesc','metricsTitle','metricsDesc','statCareers','statMissions','statXp','statLevel','resultsTitle','resultsDesc','explainBtn',
+        'viewAllDirectionsBtn','missionsTitle','missionsDesc','profileTitle','profileDesc','publicProfileTitle','publicProfileSubtitle','profileVisibility','copyProfileBtn','exportJsonBtn','cvTitle','cvDesc','copyCvBtn',
+        'roadmapTitle','roadmapDesc','progressTitle','progressDesc','progressXpLabel','progressDoneLabel','badgesTitle','badgesDesc','mapTitle','mapDesc','journalTitle','journalDesc',
+        'journalPrompt','saveJournalBtn','linkedinBtn','landingTitle','landingDesc','landingEyebrow','landingHeroTitle','landingHeroDesc','waitlistBtn','watchDemoBtn','personasTitle',
+        'featuresTitle','featuresDesc','testimonialsTitle','testimonialsDesc','footerNote','prevStepBtn','sampleBtn','demoFillBtn','resetBtn','shareProfileBtn',
+        'readonlyEyebrow','exitReadonlyBtn','adminTitle','adminDesc','adminAddMissionTitle','adminMissionTitleLabel','adminMissionOrgLabel','adminMissionCityLabel','adminMissionDomainLabel',
+        'adminMissionModeLabel','adminMissionLevelLabel','adminMissionXpLabel','adminMissionDescLabel','adminAddMissionBtn','adminTotalMissionsLabel','adminCompletedMissionsLabel','adminSavedMissionsLabel'
+      ].forEach(key => { if (el[key]) el[key].textContent = t(key); });
+
+      el.heroPrimary.textContent = t('heroPrimary');
+      el.heroSecondary.textContent = t('heroSecondary');
+      el.journalInput.placeholder = t('journalPlaceholder');
+      el.missionSearchInput.placeholder = t('missionSearchPlaceholder');
+      el.careerSearchInput.placeholder = t('exploreSearchPlaceholder');
+      el.missionCount.textContent = missions().length;
+      el.levelValue.textContent = `L${currentLevel()}`;
+      el.autosaveText.textContent = t('autosaveSaved');
+      el.ringCaption.textContent = t('ringCaption');
+      renderTabs();
+      renderStepper();
+      renderMissionFilters();
+      renderMissionSort();
+      renderCareerFilter();
+      renderLandingFeatures();
+      renderPersonas();
+      renderTestimonials();
+      renderAdminInputs();
+      applyTheme();
+    }
+
+    function renderStepper() {
+      el.stepper.innerHTML = '';
+      t('steps').forEach((label, index) => {
+        const item = document.createElement('div');
+        item.className = `step-pill ${state.currentStep === index ? 'active' : ''}`;
+        item.innerHTML = `<strong>${index + 1}</strong><div class="small" style="margin-top:4px;">${label}</div>`;
+        el.stepper.appendChild(item);
+      });
+      renderStepContent();
+    }
+
+    function optionButtons(items, selectedIndex) {
+      return `<div class="filters">${items.map((item, index) => `<button type="button" class="chip ${selectedIndex === index ? 'active' : ''}" data-pick="${index}">${item}</button>`).join('')}</div>`;
+    }
+
+    function renderStepContent() {
+      const p = state.profile;
+      const step = state.currentStep;
+      let html = '';
+
+      if (step === 0) {
+        html = `
+          <div class="grid-2">
+            <label>
+              <span>${t('labelName')}</span>
+              <input id="nameInput" value="${escapeHtml(p.name)}" placeholder="${escapeHtml(t('namePlaceholder'))}" />
+            </label>
+            <div>
+              <span class="label">${t('labelGoal')}</span>
+              ${optionButtons(t('goalOptions'), p.goal)}
+            </div>
+          </div>
+        `;
+      }
+      if (step === 1) {
+        html = `
+          <div>
+            <span class="label">${t('labelPreference')}</span>
+            ${optionButtons(t('preferences'), p.preference)}
+          </div>
+        `;
+      }
+      if (step === 2) {
+        html = `
+          <div class="grid-2">
+            <label>
+              <span>${t('labelInterests')}</span>
+              <input id="interestsInput" value="${escapeHtml(p.interests)}" placeholder="${escapeHtml(t('interestsPlaceholder'))}" />
+            </label>
+            <label>
+              <span>${t('labelSkills')}</span>
+              <input id="skillsInput" value="${escapeHtml(p.skills)}" placeholder="${escapeHtml(t('skillsPlaceholder'))}" />
+            </label>
+          </div>
+        `;
+      }
+      if (step === 3) {
+        html = `
+          <div>
+            <span class="label">${t('labelExperience')}</span>
+            ${optionButtons(t('experience'), p.experience)}
+          </div>
+        `;
+      }
+
+      el.stepContent.innerHTML = html;
+
+      const nameInput = document.getElementById('nameInput');
+      const interestsInput = document.getElementById('interestsInput');
+      const skillsInput = document.getElementById('skillsInput');
+
+      if (nameInput) nameInput.addEventListener('input', e => {
+        state.profile.name = e.target.value;
+        saveState();
+        renderProfile();
+      });
+
+      if (interestsInput) interestsInput.addEventListener('input', e => {
+        state.profile.interests = e.target.value;
+        saveState();
+        renderSkillGap();
+      });
+
+      if (skillsInput) skillsInput.addEventListener('input', e => {
+        state.profile.skills = e.target.value;
+        saveState();
+        renderSkillGap();
+      });
+
+      el.stepContent.querySelectorAll('[data-pick]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const index = Number(btn.dataset.pick);
+          if (step === 0) state.profile.goal = index;
+          if (step === 1) state.profile.preference = index;
+          if (step === 3) state.profile.experience = index;
+          saveState();
+          renderStepper();
+        });
+      });
+
+      el.nextStepBtn.textContent = step === 3 ? t('generateBtn') : t('nextStepBtn');
+      el.prevStepBtn.disabled = step === 0;
+      renderSkillGap();
+    }
+
+    function escapeHtml(str) {
+      return String(str || '').replace(/[&<>"']/g, m => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[m]));
+    }
+
+    function getSkillGapList() {
+      const selected = getCareerById(state.selectedCareer) || inferBestCareer();
+      if (!selected) return [];
+      const skills = normalize(state.profile.skills);
+      return selected.gaps.filter(gap => !skills.includes(normalize(gap.split(' ')[0]))).slice(0, 3);
+    }
+
+    function renderSkillGap() {
+      const gap = getSkillGapList();
+      if (!gap.length) {
+        el.skillGapBox.innerHTML = `<strong>${t('skillGapTitle')}</strong><div class="small" style="margin-top:6px;">${t('skillGapEmpty')}</div>`;
+      } else {
+        el.skillGapBox.innerHTML = `<strong>${t('skillGapTitle')}</strong><div class="small" style="margin-top:6px;">${t('skillGapLabel')}: ${gap.join(', ')}</div>`;
+      }
+    }
+
+    function inferBestCareer() {
+      return state.results[0] ? getCareerById(state.results[0].id) : null;
+    }
+
+    function getCareerById(id) {
+      return careerCatalog.find(c => c.id === id);
+    }
+
+    function showResultsSkeleton() {
+      el.resultsSkeleton.classList.remove('hidden');
+      el.resultsSkeleton.innerHTML = Array.from({ length: 3 }).map(() => `<div class="skeleton-card"><strong>${t('resultsThinking')}</strong><div class="small" style="margin-top:8px;">...</div></div>`).join('');
+      el.resultsList.innerHTML = '';
+    }
+
+    function scoreCareer(career) {
+      const interests = normalize(state.profile.interests);
+      const skills = normalize(state.profile.skills);
+      const pref = state.profile.preference;
+      const exp = state.profile.experience;
+      const goal = state.profile.goal;
+
+      let score = 45;
+      const breakdown = [];
+
+      if (pref === 0 && career.domain === 'Tech') { score += 22; breakdown.push(['+22', 'Tech preference match']); }
+      if (pref === 1 && ['Educație','Sănătate'].includes(career.domain)) { score += 20; breakdown.push(['+20', 'People / community preference']); }
+      if (pref === 2 && career.domain === 'Design') { score += 24; breakdown.push(['+24', 'Creative preference match']); }
+      if (pref === 3 && career.domain === 'Mediu') { score += 24; breakdown.push(['+24', 'Nature / action preference']); }
+
+      let tagPoints = 0;
+      career.tags.forEach(tag => {
+        if (interests.includes(normalize(tag)) || skills.includes(normalize(tag))) tagPoints += 7;
+      });
+      if (tagPoints) {
+        score += tagPoints;
+        breakdown.push([`+${tagPoints}`, 'Interests / skills match']);
+      }
+
+      if (goal === 1 && ['ux','pm','data'].includes(career.id)) { score += 8; breakdown.push(['+8', 'Portfolio-aligned path']); }
+      if (goal === 2 && ['community','green','health'].includes(career.id)) { score += 8; breakdown.push(['+8', 'Volunteering-aligned path']); }
+      if (exp === 0 && ['community','ux','health'].includes(career.id)) { score += 5; breakdown.push(['+5', 'Beginner-friendly']); }
+      if (exp === 2 && ['data','pm','green'].includes(career.id)) { score += 6; breakdown.push(['+6', 'Advanced-ready path']); }
+
+      return { ...career, score: Math.min(98, score), breakdown };
+    }
+
+    function generateRecommendations() {
+      showResultsSkeleton();
+      saveState();
+
+      setTimeout(() => {
+        const scored = careerCatalog.map(scoreCareer).sort((a,b) => b.score - a.score);
+        state.allCareerScores = scored.map(item => ({ id: item.id, score: item.score, breakdown: item.breakdown }));
+        state.results = scored.slice(0,3).map(item => ({ id: item.id, score: item.score, breakdown: item.breakdown }));
+        state.selectedCareer = scored[0]?.id || null;
+        saveState();
+        el.resultsSkeleton.classList.add('hidden');
+        renderDynamic();
+      }, 700);
+    }
+
+    function renderResults() {
+      el.resultsList.innerHTML = '';
+      if (!state.results.length) {
+        el.resultsList.innerHTML = `<div class="empty">${t('emptyResults')}</div>`;
+        return;
+      }
+
+      state.results.forEach(result => {
+        const data = getCareerById(result.id);
+        const gaps = data.gaps.slice(0, 3);
+        const card = document.createElement('article');
+        card.className = 'result-card';
+        card.innerHTML = `
+          <div class="result-head">
+            <div>
+              <strong>${data[state.locale].title}</strong>
+              <div class="small">${data.domain}</div>
+            </div>
+            <div class="score">${result.score}% ${t('fitScore')}</div>
+          </div>
+          <p class="muted">${data[state.locale].reason}</p>
+          <div class="badge-row">
+            <span class="tag">+${data.xp} XP</span>
+            <span class="tag">${t('whyFits')}</span>
+          </div>
+          <div class="helper" style="margin-top:12px;">
+            <strong>${t('skillGapTitle')}</strong>
+            <div class="small" style="margin-top:6px;">${gaps.join(', ')}</div>
+          </div>
+          <div class="score-breakdown">
+            ${(result.breakdown || []).slice(0,3).map(([pts, label]) => `<div class="score-line"><span>${label}</span><strong>${pts}</strong></div>`).join('')}
+          </div>
+        `;
+        card.addEventListener('click', () => {
+          state.selectedCareer = data.id;
+          saveState();
+          renderDynamic();
+          document.getElementById('roadmap').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        });
+        el.resultsList.appendChild(card);
+      });
+
+      el.careerCount.textContent = String(careerCatalog.length);
+      renderExploreGrid();
+    }
+
+    function renderCareerFilter() {
+      el.careerDomainFilter.innerHTML = `
+        <option value="all">${t('exploreAllDomains')}</option>
+        ${['Tech','Design','Educație','Sănătate','Mediu'].map(d => `<option value="${d}" ${state.careerDomain === d ? 'selected' : ''}>${d}</option>`).join('')}
+      `;
+      el.careerSearchInput.value = state.careerSearch;
+    }
+
+    function renderExploreGrid() {
+      const query = normalize(state.careerSearch);
+      const filtered = state.allCareerScores
+        .map(entry => {
+          const career = getCareerById(entry.id);
+          return { ...career, score: entry.score, breakdown: entry.breakdown || [] };
+        })
+        .filter(career => {
+          const hay = normalize(`${career[state.locale].title} ${career[state.locale].reason} ${career.tags.join(' ')}`);
+          const domainOk = state.careerDomain === 'all' || career.domain === state.careerDomain;
+          const queryOk = !query || hay.includes(query);
+          return domainOk && queryOk;
+        });
+
+      el.exploreGrid.classList.toggle('hidden', !state.exploreMode);
+
+      if (!state.exploreMode) {
+        el.exploreGrid.innerHTML = '';
+        return;
+      }
+
+      if (!filtered.length) {
+        el.exploreGrid.innerHTML = `<div class="empty" style="grid-column:1/-1;">No directions found. Try another search or domain filter.</div>`;
+        return;
+      }
+
+      el.exploreGrid.innerHTML = filtered.map(career => `
+        <article class="result-card" data-career="${career.id}">
+          <div class="result-head">
+            <div>
+              <strong>${career[state.locale].title}</strong>
+              <div class="small">${career.domain}</div>
+            </div>
+            <div class="score">${career.score}%</div>
+          </div>
+          <p class="muted">${career[state.locale].reason}</p>
+          <div class="badge-row">
+            ${career.tags.slice(0,3).map(tag => `<span class="tag">${tag}</span>`).join('')}
+          </div>
+        </article>
+      `).join('');
+
+      el.exploreGrid.querySelectorAll('[data-career]').forEach(card => {
+        card.addEventListener('click', () => {
+          state.selectedCareer = card.dataset.career;
+          saveState();
+          renderDynamic();
+        });
+      });
+    }
+
+    function renderRoadmap() {
+      el.roadmapList.innerHTML = '';
+      const selected = getCareerById(state.selectedCareer);
+      if (!selected) {
+        el.roadmapList.innerHTML = `<div class="empty">${t('emptyRoadmap')}</div>`;
+        return;
+      }
+      t('roadmapSteps').forEach((step, index) => {
+        const item = document.createElement('div');
+        item.className = 'roadmap-step';
+        item.innerHTML = `
+          <div class="step-index">${index + 1}</div>
+          <div>
+            <strong>${step}</strong>
+            <p class="muted" style="margin:6px 0 0;">${selected[state.locale].title}</p>
+            <div class="small" style="margin-top:6px;">${t('roadmapMicro')[index]}</div>
+          </div>
+        `;
+        el.roadmapList.appendChild(item);
+      });
+    }
+
+    function renderMissionFilters() {
+      el.missionFilters.innerHTML = '';
+      const values = ['All','Tech','Design','Educație','Sănătate','Mediu','Favorite'];
+      t('filters').forEach((label, index) => {
+        const btn = document.createElement('button');
+        btn.className = `chip ${state.missionFilter === values[index] ? 'active' : ''}`;
+        btn.textContent = label;
+        btn.addEventListener('click', () => {
+          state.missionFilter = values[index];
+          saveState();
+          renderMissions();
+        });
+        el.missionFilters.appendChild(btn);
+      });
+    }
+
+    function renderMissionSort() {
+      el.missionSortSelect.innerHTML = `
+        <option value="default">${t('missionSortDefault')}</option>
+        <option value="xp" ${state.missionSort === 'xp' ? 'selected' : ''}>${t('missionSortXp')}</option>
+        <option value="level" ${state.missionSort === 'level' ? 'selected' : ''}>${t('missionSortLevel')}</option>
+        <option value="mode" ${state.missionSort === 'mode' ? 'selected' : ''}>${t('missionSortMode')}</option>
+      `;
+      el.missionSearchInput.value = state.missionSearch;
+    }
+
+    function missionMatchesFilter(m) {
+      if (state.missionFilter === 'All') return true;
+      if (state.missionFilter === 'Favorite') return state.savedMissionIds.includes(m.id);
+      return m.domain === state.missionFilter;
+    }
+
+    function getFilteredMissions() {
+      const query = normalize(state.missionSearch);
+      let list = missions().filter(missionMatchesFilter).filter(m => {
+        if (!query) return true;
+        const title = normalize(m[state.locale].title);
+        const city = normalize(m.city);
+        const org = normalize(m.org);
+        return title.includes(query) || city.includes(query) || org.includes(query);
+      });
+
+      if (state.missionSort === 'xp') {
+        list.sort((a,b) => b.xp - a.xp);
+      } else if (state.missionSort === 'level') {
+        const order = t('levelOrder');
+        list.sort((a,b) => order.indexOf(a.level) - order.indexOf(b.level));
+      } else if (state.missionSort === 'mode') {
+        list.sort((a,b) => a.mode.localeCompare(b.mode));
+      }
+
+      return list;
+    }
+
+    function renderMissions() {
+      el.missionList.innerHTML = '';
+      const filtered = getFilteredMissions();
+
+      if (!filtered.length) {
+        el.missionList.innerHTML = `<div class="empty">${t('missionEmpty')}</div>`;
+        return;
+      }
+
+      filtered.forEach(mission => {
+        const done = state.completedMissionIds.includes(mission.id);
+        const saved = state.savedMissionIds.includes(mission.id);
+        const card = document.createElement('article');
+        card.className = 'mission-card';
+        card.innerHTML = `
+          <div class="mission-head">
+            <div>
+              <strong>${mission[state.locale].title}</strong>
+              <div class="small">${mission.org} · ${mission.city}</div>
+            </div>
+            <div class="score">+${mission.xp} XP</div>
+          </div>
+          <p class="muted">${mission[state.locale].desc}</p>
+          <div class="badge-row">
+            <span class="tag">${mission.domain}</span>
+            <span class="mode">${mission.mode === 'remote' ? t('missionRemote') : t('missionLocal')}</span>
+            <span class="tag">${mission.level}</span>
+          </div>
+        `;
+
+        const actions = document.createElement('div');
+        actions.className = 'action-row';
+
+        const viewBtn = document.createElement('button');
+        viewBtn.className = 'btn ghost';
+        viewBtn.textContent = t('missionSelect');
+        viewBtn.onclick = () => {
+          state.selectedMissionId = mission.id;
+          saveState();
+          renderMap();
+          document.getElementById('map').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        };
+
+        const detailBtn = document.createElement('button');
+        detailBtn.className = 'btn ghost';
+        detailBtn.textContent = 'Details';
+        detailBtn.onclick = () => openMissionModal(mission);
+
+        const saveBtn = document.createElement('button');
+        saveBtn.className = `btn ghost ${saved ? 'active' : ''}`;
+        saveBtn.textContent = saved ? t('missionSaved') : t('missionSave');
+        saveBtn.onclick = () => {
+          if (saved) state.savedMissionIds = state.savedMissionIds.filter(id => id !== mission.id);
+          else state.savedMissionIds.unshift(mission.id);
+          saveState();
+          renderDynamic();
+        };
+
+        const applyBtn = document.createElement('button');
+        applyBtn.className = 'btn ghost';
+        applyBtn.textContent = t('missionApply');
+        applyBtn.onclick = () => showToast('Demo CTA');
+
+        const doneBtn = document.createElement('button');
+        doneBtn.className = done ? 'btn ghost' : 'btn success';
+        doneBtn.textContent = done ? '✓' : t('missionComplete');
+        doneBtn.disabled = done;
+        doneBtn.onclick = () => {
+          if (!done) {
+            state.completedMissionIds.unshift(mission.id);
+            state.xp += mission.xp;
+            touchActivity();
+            saveState();
+            renderDynamic();
+            showToast(t('missionDoneToast'), 'xp');
+          }
+        };
+
+        actions.append(viewBtn, detailBtn, saveBtn, applyBtn, doneBtn);
+        card.appendChild(actions);
+        el.missionList.appendChild(card);
+      });
+    }
+
+    function touchActivity() {
+      const today = new Date();
+      const todayStr = dateKey(today);
+      if (!state.lastActiveDate) {
+        state.streak = 1;
+        state.lastActiveDate = todayStr;
+        return;
+      }
+
+      const prev = new Date(state.lastActiveDate + 'T00:00:00');
+      const diffDays = Math.floor((new Date(todayStr + 'T00:00:00') - prev) / 86400000);
+
+      if (diffDays === 0) {
+        return;
+      } else if (diffDays === 1) {
+        state.streak += 1;
+      } else {
+        state.streak = 1;
+      }
+      state.lastActiveDate = todayStr;
+    }
+
+    function dateKey(d) {
+      return new Date(d).toISOString().slice(0,10);
+    }
+
+    function renderProgress() {
+      el.progressXp.textContent = `${state.xp} XP`;
+      el.progressDone.textContent = String(state.completedMissionIds.length);
+      el.levelValue.textContent = `L${currentLevel()}`;
+      el.xpCount.textContent = `${state.xp} XP`;
+      el.xpFill.style.width = `${xpPercent()}%`;
+      el.xpMeta.textContent = `${t('xpMeta')} ${nextLevelXp()} XP · streak ${state.streak}`;
+      renderRing();
+
+      if (!state.completedMissionIds.length) {
+        el.progressPortfolio.innerHTML = `<div class="empty">${t('noActivity')}</div>`;
+        return;
+      }
+
+      const completed = state.completedMissionIds.map(id => missions().find(m => m.id === id)).filter(Boolean);
+      el.progressPortfolio.innerHTML = `
+        <div class="result-card">
+          <strong>${t('completedPortfolio')}</strong>
+          <div class="journal-list" style="margin-top:12px;">
+            ${completed.map(m => `<div class="tag">${m[state.locale].title}</div>`).join('')}
+          </div>
+        </div>
+      `;
+    }
+
+    function renderRing() {
+      const circumference = 2 * Math.PI * 48;
+      const pct = xpPercent();
+      const offset = circumference - (pct / 100) * circumference;
+      el.ringProgress.style.strokeDasharray = `${circumference}`;
+      el.ringProgress.style.strokeDashoffset = `${offset}`;
+      el.ringPercent.textContent = `${pct}%`;
+      el.ringCaption.textContent = t('ringCaption');
+    }
+
+    function renderBadges() {
+      el.badgeGrid.innerHTML = '';
+      badgeCatalog.forEach(badge => {
+        const unlocked = badge.threshold(state);
+        const [title, desc] = badgeNames[state.locale][badge.id];
+        const card = document.createElement('div');
+        card.className = `badge-card ${unlocked ? 'unlocked' : 'locked'}`;
+        card.innerHTML = `
+          <div class="badge-emoji">${badge.emoji}</div>
+          <strong style="display:block; margin-top:8px;">${title}</strong>
+          <div class="small" style="margin-top:6px;">${desc}</div>
+          <div class="mini-row" style="margin-top:10px;">
+            <span class="tag">${unlocked ? 'Unlocked' : 'Locked'}</span>
+          </div>
+        `;
+        el.badgeGrid.appendChild(card);
+      });
+    }
+
+    function renderMap() {
+      el.pinList.innerHTML = '';
+      missions().forEach(mission => {
+        const active = state.selectedMissionId === mission.id;
+        const item = document.createElement('button');
+        item.className = `pin-card ${active ? 'active' : ''}`;
+        item.style.textAlign = 'left';
+        item.innerHTML = `
+          <div class="pin-head">
+            <div>
+              <strong>${mission.org}</strong>
+              <div class="small">${mission.city}</div>
+            </div>
+            <span class="tag">${mission.domain}</span>
+          </div>
+          <div class="small">${mission[state.locale].title}</div>
+        `;
+        item.addEventListener('click', () => {
+          state.selectedMissionId = mission.id;
+          saveState();
+          renderMap();
+        });
+        el.pinList.appendChild(item);
+      });
+
+      const selected = missions().find(m => m.id === state.selectedMissionId);
+      if (!selected) {
+        el.mapDetails.innerHTML = `<strong>${t('mapEmptyTitle')}</strong><p class="muted">${t('mapEmptyBody')}</p>`;
+        return;
+      }
+
+      el.mapDetails.innerHTML = `
+        <div class="result-head">
+          <div>
+            <strong>${selected.org}</strong>
+            <div class="small">${selected.city}</div>
+          </div>
+          <span class="mode">${selected.mode === 'remote' ? t('missionRemote') : t('missionLocal')}</span>
+        </div>
+        <p><strong>${selected[state.locale].title}</strong></p>
+        <p class="muted">${selected[state.locale].desc}</p>
+        <div class="badge-row">
+          <span class="tag">${selected.domain}</span>
+          <span class="tag">+${selected.xp} XP</span>
+          <span class="tag">${selected.level}</span>
+        </div>
+      `;
+    }
+
+    function renderJournal() {
+      el.journalList.innerHTML = '';
+      if (!state.journal.length) {
+        el.journalList.innerHTML = `<div class="empty">${t('journalEmpty')}</div>`;
+      } else {
+        state.journal.forEach((entry, index) => {
+          const card = document.createElement('article');
+          card.className = 'entry-card';
+          card.innerHTML = `
+            <div class="entry-head">
+              <strong>#${state.journal.length - index}</strong>
+              <span class="small">${new Date(entry.date).toLocaleDateString(state.locale === 'ro' ? 'ro-RO' : 'en-US')}</span>
+            </div>
+            <p class="muted">${escapeHtml(entry.text)}</p>
+          `;
+          el.journalList.appendChild(card);
+        });
+      }
+      el.linkedinDraft.innerHTML = `<strong>${t('linkedinTitle')}</strong><p class="muted" style="white-space:pre-wrap; margin-bottom:0;">${escapeHtml(state.linkedinDraft || t('linkedinEmpty'))}</p>`;
+    }
+
+    function profileText() {
+      const best = getCareerById(state.selectedCareer);
+      const completed = state.completedMissionIds.map(id => missions().find(m => m.id === id)?.[state.locale]?.title).filter(Boolean);
+      return `${state.profile.name || 'User'} · ${best ? best[state.locale].title : 'Explorer'}\n${state.profile.interests || '-'}\nXP: ${state.xp} · Level: ${currentLevel()}\nCompleted missions: ${completed.join(', ') || '-'}`;
+    }
+
+    function cvText() {
+      const best = getCareerById(state.selectedCareer);
+      return `${state.profile.name || 'Candidate'} is currently exploring ${best ? best[state.locale].title : 'career pathways'} through ALPIS ImpactPath. They have built momentum through ${state.completedMissionIds.length} completed mission(s), ${state.xp} XP, and documented product learning through journal reflection. Core interests: ${state.profile.interests || '-'} · Current skills: ${state.profile.skills || '-'}.`;
+    }
+
+    function getShareableProfileUrl() {
+      const url = new URL(window.location.href);
+      url.searchParams.set('view', 'profile');
+      url.hash = 'profile-view';
+      return url.toString();
+    }
+
+    function renderProfile() {
+      const best = getCareerById(state.selectedCareer);
+      el.publicProfileContent.innerHTML = `
+        <div class="small">${state.profile.name || '-'} · ${best ? best[state.locale].title : '-'}</div>
+        <div class="badge-row" style="margin-top:12px;">
+          <span class="tag">XP ${state.xp}</span>
+          <span class="tag">L${currentLevel()}</span>
+          <span class="tag">${state.completedMissionIds.length} missions</span>
+        </div>
+        <p class="muted" style="margin-top:12px;">${state.profile.interests || '-'}</p>
+      `;
+      el.cvPreview.innerHTML = `<p class="muted">${escapeHtml(cvText())}</p>`;
+      el.shareBanner.innerHTML = `${t('shareBanner')} <strong>${escapeHtml(getShareableProfileUrl())}</strong>`;
+      renderReadonlyProfile();
+    }
+
+    function renderReadonlyProfile() {
+      const best = getCareerById(state.selectedCareer);
+      const completed = state.completedMissionIds.map(id => missions().find(m => m.id === id)).filter(Boolean);
+      el.readonlyName.textContent = state.profile.name || 'ALPIS User';
+      el.readonlyRole.textContent = best ? best[state.locale].title : t('readonlyRoleFallback');
+      el.readonlyProfileBody.innerHTML = `
+        <div class="badge-row">
+          <span class="tag">XP ${state.xp}</span>
+          <span class="tag">L${currentLevel()}</span>
+          <span class="tag">${state.completedMissionIds.length} missions</span>
+          <span class="tag">streak ${state.streak}</span>
+        </div>
+        <p class="muted" style="margin-top:14px;">${state.profile.interests || '-'}</p>
+        <div class="helper">
+          <strong>${t('completedPortfolio')}</strong>
+          <div class="journal-list" style="margin-top:10px;">
+            ${completed.length ? completed.map(m => `<div class="tag">${m[state.locale].title}</div>`).join('') : `<div class="small">-</div>`}
+          </div>
+        </div>
+      `;
+    }
+
+    function renderLandingFeatures() {
+      el.landingFeatures.innerHTML = '';
+      t('features').forEach(([title, desc]) => {
+        const card = document.createElement('div');
+        card.className = 'feature-card';
+        card.innerHTML = `<strong>${title}</strong><p class="small" style="margin-top:8px;">${desc}</p>`;
+        el.landingFeatures.appendChild(card);
+      });
+    }
+
+    function renderPersonas() {
+      el.personasGrid.innerHTML = '';
+      t('personas').forEach(([title, desc]) => {
+        const card = document.createElement('div');
+        card.className = 'persona-card';
+        card.innerHTML = `<strong>${title}</strong><div class="small" style="margin-top:8px;">${desc}</div>`;
+        el.personasGrid.appendChild(card);
+      });
+    }
+
+    function renderTestimonials() {
+      el.testimonialsList.innerHTML = '';
+      t('testimonials').forEach(([name, text]) => {
+        const card = document.createElement('div');
+        card.className = 'testimonial-card';
+        card.innerHTML = `<strong>${name}</strong><p class="small" style="margin-top:8px;">“${text}”</p>`;
+        el.testimonialsList.appendChild(card);
+      });
+    }
+
+    function renderAdminInputs() {
+      el.adminMissionDomainSelect.innerHTML = ['Tech','Design','Educație','Sănătate','Mediu'].map(v => `<option value="${v}">${v}</option>`).join('');
+      el.adminMissionModeSelect.innerHTML = t('modeOptions').map(v => `<option value="${v}">${v}</option>`).join('');
+      el.adminMissionLevelSelect.innerHTML = t('levelOrder').map(v => `<option value="${v}">${v}</option>`).join('');
+    }
+
+    function renderAdmin() {
+      el.adminTotalMissions.textContent = String(missions().length);
+      el.adminCompletedMissions.textContent = String(state.completedMissionIds.length);
+      el.adminSavedMissions.textContent = String(state.savedMissionIds.length);
+
+      el.adminMissionList.innerHTML = missions().map(m => `
+        <div class="card">
+          <div class="result-head">
+            <div>
+              <strong>${m[state.locale].title}</strong>
+              <div class="small">${m.org} · ${m.city}</div>
+            </div>
+            <span class="tag">+${m.xp} XP</span>
+          </div>
+          <div class="badge-row">
+            <span class="tag">${m.domain}</span>
+            <span class="tag">${m.level}</span>
+            <span class="tag">${m.mode}</span>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function openMissionModal(mission) {
+      el.missionModalTitle.textContent = mission[state.locale].title;
+      el.missionModalMeta.textContent = `${mission.org} · ${mission.city} · ${mission.domain} · +${mission.xp} XP`;
+      el.missionModalBody.innerHTML = `
+        <div class="card">
+          <strong>${t('missionModalExtended')}</strong>
+          <p class="muted" style="margin-top:8px;">${mission.extended[state.locale]}</p>
+        </div>
+        <div class="grid-2" style="margin-top:14px;">
+          <div class="card">
+            <strong>${t('missionModalSkills')}</strong>
+            <div class="journal-list" style="margin-top:10px;">
+              ${mission.skills.map(s => `<div class="tag">${s}</div>`).join('')}
+            </div>
+          </div>
+          <div class="card">
+            <strong>${t('missionModalImpact')}</strong>
+            <p class="muted" style="margin-top:8px;">${mission.impact}</p>
+          </div>
+        </div>
+      `;
+      el.missionModalBackdrop.classList.add('show');
+    }
+
+    function closeMissionModal() {
+      el.missionModalBackdrop.classList.remove('show');
+    }
+
+    function renderDynamic() {
+      renderResults();
+      renderRoadmap();
+      renderMissions();
+      renderProgress();
+      renderBadges();
+      renderMap();
+      renderJournal();
+      renderProfile();
+      renderSkillGap();
+      renderAdmin();
+    }
+
+    function fillSample() {
+      state.profile = {
+        name: t('sampleName'),
+        goal: 1,
+        preference: 2,
+        interests: t('sampleInterests'),
+        skills: t('sampleSkills'),
+        experience: 1
+      };
+      state.currentStep = 0;
+      saveState();
+      renderStepper();
+      renderDynamic();
+    }
+
+    function resetAll() {
+      localStorage.removeItem('alpis-impactpath-v35');
+      location.reload();
+    }
+
+    function handleReadonlyMode() {
+      const url = new URL(window.location.href);
+      const readonly = url.searchParams.get('view') === 'profile' || window.location.hash === '#profile-view';
+      el.readonlyView.classList.toggle('hidden', !readonly);
+      el.appShell.classList.toggle('hidden', readonly);
+      document.getElementById('topbar').classList.toggle('hidden', readonly);
+    }
+
+    el.prevStepBtn.addEventListener('click', () => {
+      if (state.currentStep > 0) {
+        state.currentStep -= 1;
+        saveState();
+        renderStepper();
+      }
+    });
+
+    el.nextStepBtn.addEventListener('click', () => {
+      if (state.currentStep < 3) {
+        state.currentStep += 1;
+        saveState();
+        renderStepper();
+      } else {
+        generateRecommendations();
+      }
+    });
+
+    el.sampleBtn.addEventListener('click', fillSample);
+    el.demoFillBtn.addEventListener('click', () => { fillSample(); generateRecommendations(); });
+    el.resetBtn.addEventListener('click', resetAll);
+
+    el.langBtn.addEventListener('click', () => {
+      state.locale = state.locale === 'ro' ? 'en' : 'ro';
+      saveState();
+      renderStatic();
+      renderDynamic();
+    });
+
+    el.themeBtn.addEventListener('click', () => {
+      state.theme = state.theme === 'dark' ? 'light' : 'dark';
+      saveState();
+      applyTheme();
+    });
+
+    el.explainBtn.addEventListener('click', () => {
+      const best = inferBestCareer();
+      showToast(best ? `${best[state.locale].title}` : 'Run onboarding first');
+    });
+
+    el.viewAllDirectionsBtn.addEventListener('click', () => {
+      state.exploreMode = !state.exploreMode;
+      saveState();
+      renderExploreGrid();
+    });
+
+    el.missionSearchInput.addEventListener('input', (e) => {
+      state.missionSearch = e.target.value;
+      saveState();
+      renderMissions();
+    });
+
+    el.missionSortSelect.addEventListener('change', (e) => {
+      state.missionSort = e.target.value;
+      saveState();
+      renderMissions();
+    });
+
+    el.careerSearchInput.addEventListener('input', (e) => {
+      state.careerSearch = e.target.value;
+      saveState();
+      renderExploreGrid();
+    });
+
+    el.careerDomainFilter.addEventListener('change', (e) => {
+      state.careerDomain = e.target.value;
+      saveState();
+      renderExploreGrid();
+    });
+
+    el.saveJournalBtn.addEventListener('click', () => {
+      const text = el.journalInput.value.trim();
+      if (!text) return;
+      state.journal.unshift({ text, date: new Date().toISOString() });
+      touchActivity();
+      el.journalInput.value = '';
+      saveState();
+      renderDynamic();
+      showToast(t('entrySaved'));
+    });
+
+    el.linkedinBtn.addEventListener('click', () => {
+      const latest = state.journal[0]?.text || '';
+      state.linkedinDraft = t('linkedinTemplate')(state.profile.name, missions().length, state.xp, latest);
+      saveState();
+      renderJournal();
+    });
+
+    el.copyProfileBtn.addEventListener('click', () => copyToClipboard(profileText()));
+    el.copyCvBtn.addEventListener('click', () => copyToClipboard(cvText()));
+    el.shareProfileBtn.addEventListener('click', () => copyToClipboard(getShareableProfileUrl()));
+
+    el.exportJsonBtn.addEventListener('click', () => {
+      downloadFile('alpis-impactpath-profile.json', JSON.stringify(state, null, 2));
+    });
+
+    el.waitlistBtn.addEventListener('click', () => showToast('Demo CTA'));
+    el.watchDemoBtn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+
+    el.exitReadonlyBtn.addEventListener('click', () => {
+      const url = new URL(window.location.href);
+      url.searchParams.delete('view');
+      url.hash = '';
+      window.history.replaceState({}, '', url.toString());
+      handleReadonlyMode();
+    });
+
+    el.closeMissionModal.addEventListener('click', closeMissionModal);
+    el.missionModalBackdrop.addEventListener('click', (e) => {
+      if (e.target === el.missionModalBackdrop) closeMissionModal();
+    });
+
+    el.adminAddMissionBtn.addEventListener('click', () => {
+      const title = el.adminMissionTitleInput.value.trim();
+      const org = el.adminMissionOrgInput.value.trim();
+      const city = el.adminMissionCityInput.value.trim();
+      const domain = el.adminMissionDomainSelect.value;
+      const mode = el.adminMissionModeSelect.value;
+      const level = el.adminMissionLevelSelect.value;
+      const xp = Math.max(5, Number(el.adminMissionXpInput.value || 15));
+      const desc = el.adminMissionDescInput.value.trim();
+
+      if (!title || !org || !city || !desc) return;
+
+      const newMission = {
+        id: Date.now(),
+        domain,
+        mode,
+        city,
+        org,
+        xp,
+        level,
+        skills: ['coordination','communication','impact delivery'],
+        impact: 'This mission helps an organization turn intention into visible community action.',
+        extended: {
+          ro: desc,
+          en: desc
+        },
+        ro: { title, desc },
+        en: { title, desc }
+      };
+
+      state.customMissions.unshift(newMission);
+      saveState();
+      renderDynamic();
+      el.adminMissionTitleInput.value = '';
+      el.adminMissionOrgInput.value = '';
+      el.adminMissionCityInput.value = '';
+      el.adminMissionXpInput.value = '';
+      el.adminMissionDescInput.value = '';
+      showToast(t('adminMissionAdded'));
+    });
+
+    renderStatic();
+    renderDynamic();
+    handleReadonlyMode();
+  </script>
+</body>
+</html>
